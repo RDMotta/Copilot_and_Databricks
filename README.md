@@ -92,11 +92,11 @@ databricks-treinner/
 > Construa um projeto de ponta a ponta: Bronze → Silver → Gold com Delta Lake. **4 etapas — Módulo 4.**
 
 <p>
-  <a href="https://codespaces.new/OWNER/REPO?quickstart=1">
+  <a href="https://codespaces.new/RDMotta/Copilot_and_Databricks?quickstart=1">
     <img src="https://github.com/codespaces/badge.svg" alt="Abrir Codespace"/>
   </a>
   &nbsp;
-  <a href="https://github.com/OWNER/REPO/actions/workflows/start-track2.yml">
+  <a href="https://github.com/RDMotta/Copilot_and_Databricks/actions/workflows/start-track2.yml">
     <img src="https://img.shields.io/badge/🏗️_Iniciar_Trilha_2-Hands--On_Lakehouse-0075ca?style=for-the-badge" alt="Iniciar Trilha 2"/>
   </a>
 </p>
@@ -107,11 +107,11 @@ databricks-treinner/
 > Identifique gargalos, aplique 7 otimizações e compare a performance. **4 etapas — Módulo 5.**
 
 <p>
-  <a href="https://codespaces.new/OWNER/REPO?quickstart=1">
+  <a href="https://codespaces.new/RDMotta/Copilot_and_Databricks?quickstart=1">
     <img src="https://github.com/codespaces/badge.svg" alt="Abrir Codespace"/>
   </a>
   &nbsp;
-  <a href="https://github.com/OWNER/REPO/actions/workflows/start-track3.yml">
+  <a href="https://github.com/RDMotta/Copilot_and_Databricks/actions/workflows/start-track3.yml">
     <img src="https://img.shields.io/badge/⚡_Iniciar_Trilha_3-Otimização_de_Pipeline-e11d48?style=for-the-badge" alt="Iniciar Trilha 3"/>
   </a>
 </p>
@@ -122,11 +122,11 @@ databricks-treinner/
 > Percurso completo pelos 6 módulos: conceitos, Copilot no dia a dia, otimização e projeto hands-on. **10 etapas.**
 
 <p>
-  <a href="https://codespaces.new/OWNER/REPO?quickstart=1">
+  <a href="https://codespaces.new/RDMotta/Copilot_and_Databricks?quickstart=1">
     <img src="https://github.com/codespaces/badge.svg" alt="Abrir Codespace"/>
   </a>
   &nbsp;
-  <a href="https://github.com/OWNER/REPO/actions/workflows/start-track1.yml">
+  <a href="https://github.com/RDMotta/Copilot_and_Databricks/actions/workflows/start-track1.yml">
     <img src="https://img.shields.io/badge/🎓_Iniciar_Trilha_1-Treinamento_Completo-6e40c9?style=for-the-badge" alt="Iniciar Trilha 1"/>
   </a>
 </p>
