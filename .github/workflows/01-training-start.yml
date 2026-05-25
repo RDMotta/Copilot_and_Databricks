@@ -1,0 +1,121 @@
+name: 🎓 Iniciar Treinamento Databricks + Copilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      participant_name:
+        description: "Nome do participante"
+        required: true
+        type: string
+      track:
+        description: "Trilha de treinamento"
+        required: true
+        type: choice
+        default: track-2-handson
+        options:
+          - track-2-handson
+          - track-3-optimization
+          - track-1-full
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  create-training-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Criar labels do treinamento
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = [
+              // ── Labels de trilha ──────────────────────────────────────────
+              { name: 'databricks-training',    color: 'e4e669', description: 'Issue de acompanhamento do treinamento' },
+              { name: 'track-2-handson',        color: '0075ca', description: 'Trilha: Projeto Lakehouse (Módulo 4)' },
+              { name: 'track-3-optimization',   color: 'e4e669', description: 'Trilha: Otimização de Pipeline (Módulo 5)' },
+              { name: 'track-1-full',           color: 'd93f0b', description: 'Trilha: Treinamento Completo' },
+              // ── Labels de progresso Trilha 2 (Hands-on) ──────────────────
+              { name: 't2-step-01', color: 'c2e0c6', description: 'T2 Etapa 1: Setup + Bronze' },
+              { name: 't2-step-02', color: 'bfd4f2', description: 'T2 Etapa 2: Silver' },
+              { name: 't2-step-03', color: 'd4c5f9', description: 'T2 Etapa 3: Gold' },
+              { name: 't2-step-04', color: '0e8a16', description: 'T2 Concluído!' },
+              // ── Labels de progresso Trilha 3 (Otimização) ────────────────
+              { name: 't3-step-01', color: 'f9d0c4', description: 'T3 Etapa 1: Setup + Baseline' },
+              { name: 't3-step-02', color: 'f9d0c4', description: 'T3 Etapa 2: Profiling' },
+              { name: 't3-step-03', color: 'f9d0c4', description: 'T3 Etapa 3: Pipeline Otimizado' },
+              { name: 't3-step-04', color: '0e8a16', description: 'T3 Concluído!' },
+              // ── Labels de progresso Trilha 1 (Completa) ──────────────────
+              { name: 'training-step-01', color: 'c2e0c6', description: 'T1 Etapa 1' },
+              { name: 'training-step-02', color: 'c2e0c6', description: 'T1 Etapa 2' },
+              { name: 'training-step-03', color: 'bfd4f2', description: 'T1 Etapa 3' },
+              { name: 'training-step-04', color: 'bfd4f2', description: 'T1 Etapa 4' },
+              { name: 'training-step-05', color: 'f9d0c4', description: 'T1 Etapa 5' },
+              { name: 'training-step-06', color: 'f9d0c4', description: 'T1 Etapa 6' },
+              { name: 'training-step-07', color: 'f9d0c4', description: 'T1 Etapa 7' },
+              { name: 'training-step-08', color: 'd4c5f9', description: 'T1 Etapa 8' },
+              { name: 'training-step-09', color: 'd4c5f9', description: 'T1 Etapa 9' },
+              { name: 'training-step-10', color: 'd4c5f9', description: 'T1 Etapa 10' },
+              { name: 'training-complete', color: '0e8a16', description: 'Treinamento concluído!' },
+            ];
+            for (const label of labels) {
+              try {
+                await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, ...label });
+              } catch {
+                await github.rest.issues.updateLabel({ owner: context.repo.owner, repo: context.repo.repo, name: label.name, color: label.color, description: label.description }).catch(() => {});
+              }
+            }
+            console.log('Labels prontos.');
+
+      - name: Criar Issue com primeira etapa da trilha
+        id: create-issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const track = '${{ github.event.inputs.track }}';
+            const participant = '${{ github.event.inputs.participant_name }}';
+
+            // Mapa de trilha → arquivo da etapa inicial e labels iniciais
+            const TRACK_CONFIG = {
+              'track-2-handson':      { stepFile: 'steps/track2/step-01.md', stepLabel: 't2-step-01',       title: 'Projeto Lakehouse (Módulo 4)' },
+              'track-3-optimization': { stepFile: 'steps/track3/step-01.md', stepLabel: 't3-step-01',       title: 'Otimização de Pipeline (Módulo 5)' },
+              'track-1-full':         { stepFile: 'steps/track1/step-01.md',         stepLabel: 'training-step-01', title: 'Treinamento Completo' },
+            };
+
+            const config = TRACK_CONFIG[track];
+            const body = fs.readFileSync(`.github/training/${config.stepFile}`, 'utf8')
+              .replace(/\{\{PARTICIPANT_NAME\}\}/g, participant)
+              .replace(/\{\{REPO\}\}/g,   context.repo.repo)
+              .replace(/\{\{OWNER\}\}/g,  context.repo.owner);
+
+            const TRACK_NAMES = {
+              'track-2-handson':      '🥇 Projeto Lakehouse',
+              'track-3-optimization': '🥈 Otimização de Pipeline',
+              'track-1-full':         '🥉 Treinamento Completo',
+            };
+
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              title: `🎓 ${TRACK_NAMES[track]} — ${participant}`,
+              body,
+              labels: ['databricks-training', track, config.stepLabel],
+            });
+
+            console.log(`Issue #${issue.data.number} criada: ${issue.data.html_url}`);
+            core.setOutput('issue_number', issue.data.number);
+            core.setOutput('issue_url',    issue.data.html_url);
+
+      - name: Resumo
+        run: |
+          echo "## 🎓 Treinamento Iniciado!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Campo | Valor |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Participante | ${{ github.event.inputs.participant_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Trilha | ${{ github.event.inputs.track }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Issue | ${{ steps.create-issue.outputs.issue_url }} |" >> $GITHUB_STEP_SUMMARY
