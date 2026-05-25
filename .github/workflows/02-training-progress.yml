@@ -1,0 +1,141 @@
+name: "📈 Rastrear Progresso do Treinamento"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "notebooks/**"
+      - "scripts/**"
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  track-progress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detectar etapa e atualizar Issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { execSync } = require('child_process');
+
+            // Arquivos alterados no commit
+            const changed = execSync(
+              'git diff --name-only HEAD~1 HEAD 2>/dev/null || git show --name-only --format= HEAD'
+            ).toString().trim().split('\n').filter(Boolean);
+            console.log('Arquivos alterados:', changed);
+
+            // Mapeamento completo por trilha
+            const TRACKS = {
+              'track-1-full': [
+                { match: 'notebooks/01_intro/',                                      step: 'steps/track1/step-02.md',         prev: 'training-step-01', next: 'training-step-02' },
+                { match: 'notebooks/02_copilot_integration/01_pyspark_with_copilot', step: 'steps/track1/step-03.md',         prev: 'training-step-02', next: 'training-step-03' },
+                { match: 'notebooks/02_copilot_integration/02_sql_with_copilot',     step: 'steps/track1/step-04.md',         prev: 'training-step-03', next: 'training-step-04' },
+                { match: 'notebooks/03_pipeline_optimization/01_baseline_pipeline',  step: 'steps/track1/step-05.md',         prev: 'training-step-04', next: 'training-step-05' },
+                { match: 'notebooks/03_pipeline_optimization/02_profiling',          step: 'steps/track1/step-06.md',         prev: 'training-step-05', next: 'training-step-06' },
+                { match: 'notebooks/03_pipeline_optimization/03_optimized_pipeline', step: 'steps/track1/step-07.md',         prev: 'training-step-06', next: 'training-step-07' },
+                { match: 'notebooks/04_project_hands_on/01_bronze_ingestion',        step: 'steps/track1/step-08.md',         prev: 'training-step-07', next: 'training-step-08' },
+                { match: 'notebooks/04_project_hands_on/02_silver_transform',        step: 'steps/track1/step-09.md',         prev: 'training-step-08', next: 'training-step-09' },
+                { match: 'notebooks/04_project_hands_on/03_gold_analytics',          step: 'steps/track1/step-10.md',         prev: 'training-step-09', next: 'training-complete', done: true },
+              ],
+              'track-2-handson': [
+                { match: 'notebooks/04_project_hands_on/01_bronze_ingestion', step: 'steps/track2/step-02.md', prev: 't2-step-01', next: 't2-step-02' },
+                { match: 'notebooks/04_project_hands_on/02_silver_transform', step: 'steps/track2/step-03.md', prev: 't2-step-02', next: 't2-step-03' },
+                { match: 'notebooks/04_project_hands_on/03_gold_analytics',   step: 'steps/track2/step-04.md', prev: 't2-step-03', next: 't2-step-04', done: true },
+              ],
+              'track-3-optimization': [
+                { match: 'notebooks/03_pipeline_optimization/01_baseline_pipeline',  step: 'steps/track3/step-02.md', prev: 't3-step-01', next: 't3-step-02' },
+                { match: 'notebooks/03_pipeline_optimization/02_profiling',          step: 'steps/track3/step-03.md', prev: 't3-step-02', next: 't3-step-03' },
+                { match: 'notebooks/03_pipeline_optimization/03_optimized_pipeline', step: 'steps/track3/step-04.md', prev: 't3-step-03', next: 't3-step-04', done: true },
+              ],
+            };
+
+            // Encontrar issue aberta com label databricks-training
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              labels: 'databricks-training',
+              state:  'open',
+              per_page: 1,
+            });
+
+            if (!issues.length) {
+              console.log('Nenhuma issue aberta. Execute o workflow 01-training-start primeiro.');
+              return;
+            }
+
+            const issue = issues[0];
+            const issueLabels = issue.labels.map(l => l.name);
+            console.log('Issue #' + issue.number + ' | labels:', issueLabels);
+
+            // Detectar trilha pelos labels da issue
+            const track = ['track-1-full', 'track-2-handson', 'track-3-optimization']
+              .find(t => issueLabels.includes(t));
+            if (!track) { console.log('Trilha nao identificada.'); return; }
+
+            // Encontrar o mapeamento que corresponde aos arquivos alterados
+            const mapping = TRACKS[track].find(m => changed.some(f => f.includes(m.match)));
+            if (!mapping) { console.log('Nenhum arquivo mapeado na trilha ' + track); return; }
+
+            console.log('Desbloqueando: ' + mapping.step + ' (next: ' + mapping.next + ')');
+
+            // Ler e personalizar o conteúdo do próximo step
+            const body = fs.readFileSync(`.github/training/${mapping.step}`, 'utf8')
+              .replace(/\{\{COMMIT_SHA\}\}/g, context.sha.substring(0, 7))
+              .replace(/\{\{COMMIT_URL\}\}/g,
+                `https://github.com/${context.repo.owner}/${context.repo.repo}/commit/${context.sha}`)
+              .replace(/\{\{ACTOR\}\}/g, context.actor);
+
+            // Postar comentário com próxima etapa
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: issue.number,
+              body,
+            });
+
+            // Trocar labels de progresso
+            await github.rest.issues.removeLabel({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: issue.number, name: mapping.prev,
+            }).catch(() => {});
+
+            const addLabel = async (name, color) => {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, labels: [name],
+              }).catch(async () => {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner, repo: context.repo.repo, name, color,
+                }).catch(() => {});
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: issue.number, labels: [name],
+                });
+              });
+            };
+
+            await addLabel(mapping.next, mapping.done ? '0e8a16' : '0075ca');
+
+            // Fechar issue quando concluído
+            if (mapping.done) {
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed', state_reason: 'completed',
+              });
+              console.log('Treinamento concluido! Issue #' + issue.number + ' fechada.');
+            }
+
+      - name: Resumo
+        run: |
+          echo "## 📈 Progresso registrado" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Autor:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY

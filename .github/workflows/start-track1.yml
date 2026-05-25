@@ -1,0 +1,80 @@
+name: "🎓 Iniciar Trilha 1 — Treinamento Completo"
+
+on:
+  workflow_dispatch:
+    inputs:
+      participant_name:
+        description: "Seu nome (ex: João Silva)"
+        required: true
+        type: string
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  start-training:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Criar Issue e labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const participantName = '${{ github.event.inputs.participant_name }}';
+            const track = 'track-1-full';
+            const trackLabel = 'track-1-full';
+            const stepLabel = 'training-step-01';
+
+            // ── Garantir que os labels existem ──────────────────────────────
+            const labelsToCreate = [
+              { name: 'databricks-training', color: '1f6feb', description: 'Treinamento Databricks + Copilot' },
+              { name: trackLabel,            color: '6e40c9', description: 'Trilha 1 — Treinamento Completo' },
+              { name: stepLabel,             color: 'e4e669', description: 'Etapa atual do treinamento' },
+            ];
+
+            for (const label of labelsToCreate) {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: label.name,
+                color: label.color,
+                description: label.description,
+              }).catch(() => {});
+            }
+
+            // ── Ler conteúdo do step inicial ────────────────────────────────
+            const stepContent = fs.readFileSync('.github/training/steps/track1/step-01.md', 'utf8');
+            const body = [
+              `## 🎓 Treinamento Databricks + Copilot — Trilha 1: Completo`,
+              ``,
+              `**Participante:** @${participantName}`,
+              `**Trilha:** Treinamento Completo (10 etapas — Módulos 1 a 6)`,
+              `**Iniciado por:** @${context.actor}`,
+              ``,
+              `---`,
+              ``,
+              stepContent,
+            ].join('\n');
+
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🎓 Treinamento Databricks [Trilha Completa] — ${participantName}`,
+              body,
+              labels: ['databricks-training', trackLabel, stepLabel],
+            });
+
+            console.log(`✅ Issue criada: #${issue.data.number} — ${issue.data.html_url}`);
+            core.setOutput('issue_url', issue.data.html_url);
+
+      - name: Resumo
+        run: |
+          echo "## 🎓 Trilha 1 — Treinamento Completo Iniciado!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Participante:** ${{ github.event.inputs.participant_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Acesse a Issue criada para ver as instruções da **Etapa 1: Setup do Ambiente**." >> $GITHUB_STEP_SUMMARY

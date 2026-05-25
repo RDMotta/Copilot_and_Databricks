@@ -1,0 +1,80 @@
+name: "🏗️ Iniciar Trilha 2 — Hands-On Lakehouse (Módulo 4)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      participant_name:
+        description: "Seu nome (ex: João Silva)"
+        required: true
+        type: string
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  start-training:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Criar Issue e labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const participantName = '${{ github.event.inputs.participant_name }}';
+            const track = 'track-2-handson';
+            const trackLabel = 'track-2-handson';
+            const stepLabel = 't2-step-01';
+
+            // ── Garantir que os labels existem ──────────────────────────────
+            const labelsToCreate = [
+              { name: 'databricks-training', color: '1f6feb', description: 'Treinamento Databricks + Copilot' },
+              { name: trackLabel,            color: '0075ca', description: 'Trilha 2 — Hands-On Lakehouse' },
+              { name: stepLabel,             color: 'e4e669', description: 'Etapa atual do treinamento' },
+            ];
+
+            for (const label of labelsToCreate) {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: label.name,
+                color: label.color,
+                description: label.description,
+              }).catch(() => {});
+            }
+
+            // ── Ler conteúdo do step inicial ────────────────────────────────
+            const stepContent = fs.readFileSync('.github/training/steps/track2/step-01.md', 'utf8');
+            const body = [
+              `## 🏗️ Treinamento Databricks + Copilot — Trilha 2: Hands-On Lakehouse`,
+              ``,
+              `**Participante:** @${participantName}`,
+              `**Trilha:** Hands-On Lakehouse — Bronze → Silver → Gold (4 etapas — Módulo 4)`,
+              `**Iniciado por:** @${context.actor}`,
+              ``,
+              `---`,
+              ``,
+              stepContent,
+            ].join('\n');
+
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🏗️ Treinamento Databricks [Hands-On Lakehouse] — ${participantName}`,
+              body,
+              labels: ['databricks-training', trackLabel, stepLabel],
+            });
+
+            console.log(`✅ Issue criada: #${issue.data.number} — ${issue.data.html_url}`);
+            core.setOutput('issue_url', issue.data.html_url);
+
+      - name: Resumo
+        run: |
+          echo "## 🏗️ Trilha 2 — Hands-On Lakehouse Iniciado!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Participante:** ${{ github.event.inputs.participant_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Acesse a Issue criada para ver as instruções da **Etapa 1: Bronze Layer**." >> $GITHUB_STEP_SUMMARY
