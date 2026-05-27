@@ -16,22 +16,20 @@ else
   echo "✅ .env já existe."
 fi
 
-# ── 2. Configurar Databricks CLI ──────────────────────────────────────────────
-if [ -n "${DATABRICKS_HOST:-}" ] && [ -n "${DATABRICKS_TOKEN:-}" ]; then
-  echo "🔧 Configurando Databricks CLI..."
-  # Recover from older setup that created ~/.databrickscfg as a directory.
-  if [ -d ~/.databrickscfg ]; then
-    rm -rf ~/.databrickscfg
-  fi
-  cat > ~/.databrickscfg << DBCFG
-[DEFAULT]
-host  = ${DATABRICKS_HOST}
-token = ${DATABRICKS_TOKEN}
-DBCFG
-  echo "✅ Databricks CLI configurado → ${DATABRICKS_HOST}"
+# ── 2. Instalar Databricks CLI (fallback se não veio no Dockerfile) ─────────────
+if ! command -v databricks >/dev/null 2>&1; then
+  echo "📥 Databricks CLI não encontrado — instalando em ~/bin..."
+  mkdir -p ~/bin
+  DATABRICKS_RUNTIME_VERSION=1 curl -fsSL \
+    https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+  # Garante ~/bin no PATH da sessão atual
+  export PATH="$HOME/bin:$PATH"
+  # Persiste no bashrc para sessões futuras
+  grep -qxF 'export PATH="$HOME/bin:$PATH"' ~/.bashrc \
+    || echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
+  echo "✅ Databricks CLI instalado: $(databricks -v 2>&1 || true)"
 else
-  echo "⚠️  DATABRICKS_HOST/TOKEN não definidos."
-  echo "   Configure em: repo → Settings → Secrets and variables → Codespaces"
+  echo "✅ Databricks CLI já disponível: $(databricks -v 2>&1 || true)"
 fi
 
 # ── 3. Gerar dados de exemplo ─────────────────────────────────────────────────
