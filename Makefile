@@ -11,6 +11,14 @@ ifneq (,$(wildcard .env))
   export
 endif
 
+
+# Defaults para paths do DBFS (sobrescritos pelo .env se definidos)
+DBFS_TRAINING_ROOT  ?= /FileStore/training
+DBFS_RAW_PATH       ?= /FileStore/training/raw
+DBFS_BRONZE_PATH    ?= /FileStore/training/ecommerce_lakehouse/bronze
+DBFS_SILVER_PATH    ?= /FileStore/training/ecommerce_lakehouse/silver
+DBFS_GOLD_PATH      ?= /FileStore/training/ecommerce_lakehouse/gold
+
 help: ## Exibe esta ajuda
 	@echo ""
 	@echo "  🎓 Databricks + Copilot Training — Comandos disponíveis"
