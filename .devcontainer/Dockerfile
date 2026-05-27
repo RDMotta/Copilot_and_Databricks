@@ -13,7 +13,10 @@ ENV DEBIAN_FRONTEND=noninteractive \
 # ── 1. Java 11 (necessário para PySpark) ─────────────────────────────────────
 # OpenJDK do Debian: mais rápido que baixar Temurin e suficiente para PySpark
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        default-jdk-headless \
+    default-jdk-headless \
+    curl \
+    unzip \
+    ca-certificates \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -24,8 +27,12 @@ RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r /tmp/requirements.txt
 
 # ── 3. Databricks CLI ─────────────────────────────────────────────────────────
-RUN curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh \
-    | sh
+# Instala de forma idempotente para evitar falha caso o binário já exista.
+RUN if command -v databricks >/dev/null 2>&1; then \
+            databricks -v; \
+        else \
+            curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh; \
+        fi
 
 # ── 4. Profile do usuário vscode ──────────────────────────────────────────────
 USER vscode
