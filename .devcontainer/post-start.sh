@@ -9,6 +9,10 @@ if [ -f .env ]; then
 fi
 
 if [ -n "${DATABRICKS_HOST:-}" ] && [ -n "${DATABRICKS_TOKEN:-}" ]; then
+  # Recover from older setup that created ~/.databrickscfg as a directory.
+  if [ -d ~/.databrickscfg ]; then
+    rm -rf ~/.databrickscfg
+  fi
   cat > ~/.databrickscfg << DBCFG
 [DEFAULT]
 host  = ${DATABRICKS_HOST}
