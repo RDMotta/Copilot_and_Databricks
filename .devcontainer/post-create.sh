@@ -19,7 +19,10 @@ fi
 # ── 2. Configurar Databricks CLI ──────────────────────────────────────────────
 if [ -n "${DATABRICKS_HOST:-}" ] && [ -n "${DATABRICKS_TOKEN:-}" ]; then
   echo "🔧 Configurando Databricks CLI..."
-  mkdir -p ~/.databrickscfg 2>/dev/null || true
+  # Recover from older setup that created ~/.databrickscfg as a directory.
+  if [ -d ~/.databrickscfg ]; then
+    rm -rf ~/.databrickscfg
+  fi
   cat > ~/.databrickscfg << DBCFG
 [DEFAULT]
 host  = ${DATABRICKS_HOST}
