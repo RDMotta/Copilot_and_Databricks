@@ -1,0 +1,78 @@
+name: "🧩 Iniciar Trilha 4 — SQL Warehouse Serverless (Conta Free)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      participant_name:
+        description: "Seu nome (ex: Joao Silva)"
+        required: true
+        type: string
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  start-training:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Criar Issue e labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const participantName = '${{ github.event.inputs.participant_name }}';
+            const track = 'track-4-sql-serverless';
+            const trackLabel = 'track-4-sql-serverless';
+            const stepLabel = 't4-step-01';
+
+            const labelsToCreate = [
+              { name: 'databricks-training', color: '1f6feb', description: 'Treinamento Databricks + Copilot' },
+              { name: trackLabel,            color: '0052cc', description: 'Trilha 4 - SQL Warehouse Serverless (Conta Free)' },
+              { name: stepLabel,             color: 'e4e669', description: 'Etapa atual do treinamento' },
+            ];
+
+            for (const label of labelsToCreate) {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: label.name,
+                color: label.color,
+                description: label.description,
+              }).catch(() => {});
+            }
+
+            const stepContent = fs.readFileSync('.github/training/steps/track4/step-01.md', 'utf8');
+            const body = [
+              `## 🧩 Treinamento Databricks + Copilot - Trilha 4: SQL Serverless Free`,
+              ``,
+              `**Participante:** @${participantName}`,
+              `**Trilha:** SQL Warehouse Serverless (2X-Small) - Extracao -> Limpeza -> ETL Gold (4 etapas)`,
+              `**Iniciado por:** @${context.actor}`,
+              ``,
+              `---`,
+              ``,
+              stepContent,
+            ].join('\n');
+
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🧩 Treinamento Databricks [SQL Serverless Free] - ${participantName}`,
+              body,
+              labels: ['databricks-training', trackLabel, stepLabel],
+            });
+
+            console.log(`Issue criada: #${issue.data.number} - ${issue.data.html_url}`);
+            core.setOutput('issue_url', issue.data.html_url);
+
+      - name: Resumo
+        run: |
+          echo "## 🧩 Trilha 4 - SQL Serverless Free iniciada" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Participante:** ${{ github.event.inputs.participant_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Acesse a issue criada para iniciar a **Etapa 1: Setup e Extracao**." >> $GITHUB_STEP_SUMMARY
