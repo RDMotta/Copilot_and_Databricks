@@ -1,5 +1,5 @@
-# ── Base: Python 3.11 com ferramentas de desenvolvimento ─────────────────────
-FROM mcr.microsoft.com/devcontainers/python:3.11-bullseye
+# ── Base: Python 3.12 com ferramentas de desenvolvimento ─────────────────────
+FROM mcr.microsoft.com/devcontainers/python:3.12-bullseye
 
 # ── Variáveis de ambiente ─────────────────────────────────────────────────────
 ENV DEBIAN_FRONTEND=noninteractive \

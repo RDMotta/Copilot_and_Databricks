@@ -29,12 +29,12 @@ help: ## Exibe esta ajuda
 
 setup: ## Instala dependências e configura o ambiente
 	@echo "📦 Instalando dependências Python..."
-	pip install --quiet -r requirements.txt
+	python3 -m pip install --quiet -r requirements.txt
 	@echo "✅ Setup concluído."
 
 generate-data: ## Gera dados de exemplo em data/raw/
 	@echo "📊 Gerando dados de exemplo..."
-	python scripts/generate_sample_data.py
+	python3 scripts/generate_sample_data.py
 
 # ── Databricks ────────────────────────────────────────────────────────────────
 
@@ -63,7 +63,7 @@ databricks-check: ## Verifica a conexão com o Databricks
 
 # ── Spark Local ───────────────────────────────────────────────────────────────
 
-test-spark: ## Testa PySpark local com Delta Lake
+test-spark: ## Testa Spark local (ou Databricks Connect, se instalado)
 	@echo "🔥 Testando PySpark + Delta Lake localmente..."
 	python3 scripts/test_spark.py
 

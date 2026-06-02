@@ -66,7 +66,16 @@ except ImportError as e:
     print(f"⚠️  {e}")
 PYCHECK
 
-# ── 5. Resumo ─────────────────────────────────────────────────────────────────
+# ── 5. Verificar Databricks Connect ───────────────────────────────────────────
+python3 - <<'DBCONNECTCHECK'
+try:
+  import databricks.connect
+  print("✅ Databricks Connect disponível")
+except ImportError as e:
+  print(f"⚠️  Databricks Connect indisponível: {e}")
+DBCONNECTCHECK
+
+# ── 6. Resumo ─────────────────────────────────────────────────────────────────
 echo ""
 echo "══════════════════════════════════════════════════════════════"
 echo "  🎉 Ambiente pronto! Próximos passos:"

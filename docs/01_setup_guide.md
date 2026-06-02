@@ -32,6 +32,8 @@
 
 ## 3. Instalando o VS Code e Extensões
 
+Antes de seguir localmente, garanta Python 3.12 ou superior e Java 11+ instalados na sua máquina.
+
 ### VS Code
 - Baixe em: https://code.visualstudio.com/
 

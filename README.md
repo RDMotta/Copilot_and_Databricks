@@ -159,8 +159,9 @@ databricks-treinner/
 
 O Codespace já vem pré-configurado com:
 - ☕ Java 11 + PySpark 3.5.1 + Delta Lake (via pip, sem download de binário)
-- 🐍 Python 3.11
+- 🐍 Python 3.12
 - 🔧 Databricks CLI
+- 🔌 Databricks Connect
 - ⚡ GitHub Copilot + Copilot Chat
 - 🗄️ Extensão Databricks para VS Code
 - 📊 Jupyter Notebook support
@@ -186,7 +187,7 @@ Se preferir rodar localmente em vez do Codespaces:
 - VS Code instalado
 - Extensão [Databricks para VS Code](https://marketplace.visualstudio.com/items?itemName=databricks.databricks)
 - GitHub Copilot (licença ativa ou trial)
-- Python 3.9+ e Java 11+
+- Python 3.12+ e Java 11+
 
 ---
 
