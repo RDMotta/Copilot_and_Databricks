@@ -48,19 +48,7 @@
 
         // Git
         "eamodio.gitlens",
-        "mhutchie.git-graph",
-
-        // Qualidade de código
-        "charliermarsh.ruff",
-        "sonarsource.sonarlint-vscode",
-
-        // Utilitários
-        "streetsidesoftware.code-spell-checker",
-        "streetsidesoftware.code-spell-checker-portuguese-brazilian",
-        "mechatroner.rainbow-csv",
-        "oderwat.indent-rainbow",
-        "aaron-bond.better-comments",
-        "usernamehw.errorlens"
+        "mhutchie.git-graph"
       ],
 
       // ── Configurações do VS Code ────────────────────────────────────────
@@ -131,20 +119,7 @@
           "*.sql": "sql",
           "*.yml": "yaml",
           "*.yaml": "yaml"
-        },
-
-        // Error Lens
-        "errorLens.enabledDiagnosticLevels": ["warning", "error"],
-
-        // Spell Check
-        "cSpell.language": "en,pt-BR",
-        "cSpell.words": [
-          "Databricks", "PySpark", "pyspark", "DBFS", "dbfs",
-          "lakehouse", "medallion", "upsert", "ntile", "zorder",
-          "coalesce", "repartition", "unpersist", "dataframe",
-          "DataFrame", "StructType", "StructField", "withColumn",
-          "orderBy", "groupBy", "dropDuplicates"
-        ]
+        }
       }
     }
   },
