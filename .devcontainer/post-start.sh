@@ -3,9 +3,15 @@
 set -euo pipefail
 
 if [ -f .env ]; then
-  set -o allexport
-  source <(grep -v '^\s*#' .env | grep -v '^\s*$')
-  set +o allexport
+  # Carrega .env sem sobrescrever variáveis já definidas pelo ambiente (Codespaces Secrets)
+  while IFS='=' read -r key value; do
+    case "$key" in
+      ''|\#*) continue ;;
+    esac
+    if [ -z "${!key:-}" ]; then
+      export "$key=$value"
+    fi
+  done < <(grep -v '^\s*#' .env | grep -v '^\s*$')
 fi
 
 if [ -n "${DATABRICKS_HOST:-}" ] && [ -n "${DATABRICKS_TOKEN:-}" ]; then
