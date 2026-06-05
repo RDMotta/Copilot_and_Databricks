@@ -3,7 +3,7 @@
 # Comandos de conveniência para uso no Codespaces
 # ════════════════════════════════════════════════════════════════════
 
-.PHONY: help setup generate-data upload-data test-spark test lint format clean
+.PHONY: help setup generate-data create-volume upload-data test-spark test lint format clean
 
 # Carrega variáveis do .env se existir
 ifneq (,$(wildcard .env))
@@ -37,7 +37,23 @@ generate-data: ## Gera dados de exemplo em data/raw/
 
 # ── Databricks ────────────────────────────────────────────────────────────────
 
-upload-data: ## Faz upload dos dados de exemplo para o Volume
+create-volume: ## Cria schema e volume no Unity Catalog (idempotente)
+	@[ -n "$(DATABRICKS_HOST)" ]  || (echo "❌ DATABRICKS_HOST não definido no .env" && exit 1)
+	@[ -n "$(DATABRICKS_TOKEN)" ] || (echo "❌ DATABRICKS_TOKEN não definido no .env" && exit 1)
+	@echo "🗄️  Garantindo schema e volume no Unity Catalog..."
+	@curl -sf -X POST "$(DATABRICKS_HOST)/api/2.1/unity-catalog/schemas" \
+	  -H "Authorization: Bearer $(DATABRICKS_TOKEN)" \
+	  -H "Content-Type: application/json" \
+	  -d "{\"catalog_name\":\"$(VOLUME_CATALOG)\",\"name\":\"$(VOLUME_SCHEMA)\"}" \
+	  >/dev/null 2>&1 || true
+	@curl -sf -X POST "$(DATABRICKS_HOST)/api/2.1/unity-catalog/volumes" \
+	  -H "Authorization: Bearer $(DATABRICKS_TOKEN)" \
+	  -H "Content-Type: application/json" \
+	  -d "{\"catalog_name\":\"$(VOLUME_CATALOG)\",\"schema_name\":\"$(VOLUME_SCHEMA)\",\"name\":\"$(VOLUME_NAME)\",\"volume_type\":\"MANAGED\"}" \
+	  >/dev/null 2>&1 || true
+	@echo "✅ Volume $(VOLUME_CATALOG).$(VOLUME_SCHEMA).$(VOLUME_NAME) pronto"
+
+upload-data: create-volume ## Faz upload dos dados de exemplo para o Volume
 	@echo "☁️  Fazendo upload para o Volume..."
 	@[ -f data/raw/orders.csv ] || (echo "❌ Execute 'make generate-data' primeiro" && exit 1)
 	databricks fs mkdirs dbfs:$(VOLUME_RAW_PATH)
