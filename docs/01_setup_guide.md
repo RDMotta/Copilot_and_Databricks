@@ -1,32 +1,27 @@
-# Guia de Setup: Databricks Community Edition + VS Code + Copilot
+# Guia de Setup: Databricks Free Edition + VS Code + Copilot
 
 ## 1. Criando sua Conta Gratuita no Databricks
 
-### Passo 1 — Acesse o Databricks Community Edition
+### Passo 1 — Acesse o Databricks Free Edition
 
-1. Acesse: https://community.cloud.databricks.com/login.html
-2. Clique em **"Sign Up"** → **"Get started with Community Edition"**
+1. Acesse: https://login.databricks.com/?dbx_source=docs&intent=CE_SIGN_UP
+2. Clique em **"Sign Up"** e crie sua conta gratuita
 3. Preencha nome, e-mail e senha
 4. Confirme o e-mail e faça login
 
-> **Limites do Community Edition:**
-> - 1 cluster com até 15GB RAM
-> - Armazenamento em DBFS (sem S3/ADLS externos)
-> - Sem suporte a Unity Catalog
-> - Suficiente para todos os exercícios deste treinamento
+> **Limites da Free Edition:**
+> - Ambiente serverless-only e quota limitada
+> - Suporte a Unity Catalog e Volumes para os exercícios deste treinamento
+> - Sem necessidade de DBFS root ou mounts para os arquivos do curso
 
 ---
 
 ## 2. Configurando o Cluster
 
 1. No Databricks, acesse **Compute → Create compute**
-2. Configure:
-   - **Cluster name:** `training-cluster`
-   - **Cluster mode:** Single Node
-   - **Databricks Runtime:** 14.x LTS (inclui Apache Spark 3.5, Scala 2.12)
-   - **Node type:** (Community Edition usa configuração padrão)
+2. Configure o compute serverless disponível na interface da Free Edition
 3. Clique em **Create compute**
-4. Aguarde o cluster iniciar (ícone verde)
+4. Aguarde o compute iniciar (ícone verde)
 
 ---
 
@@ -63,7 +58,7 @@ Faça login com sua conta GitHub quando solicitado.
 ### Configurando a extensão no VS Code
 
 1. Pressione `Ctrl+Shift+P` → digite **"Databricks: Configure workspace"**
-2. Selecione **"Databricks Community Edition"**
+2. Selecione **"Databricks Free Edition"**
 3. Informe a URL do seu workspace: `https://community.cloud.databricks.com`
 4. Cole o Personal Access Token gerado
 5. Selecione o cluster criado anteriormente
@@ -72,7 +67,7 @@ Faça login com sua conta GitHub quando solicitado.
 
 No VS Code, o painel lateral da extensão Databricks deve mostrar:
 - Status do cluster (Running/Terminated)
-- Arquivos do DBFS
+- Arquivos do Volume
 - Jobs disponíveis
 
 ---
@@ -111,8 +106,8 @@ Crie a estrutura no Databricks Workspace:
 
 ## 7. Checklist Final
 
-- [ ] Conta Databricks Community Edition criada e funcionando
-- [ ] Cluster criado e no status "Running"
+- [ ] Conta Databricks Free Edition criada e funcionando
+- [ ] Compute serverless criado e no status "Running"
 - [ ] VS Code instalado
 - [ ] Extensão Databricks instalada e conectada ao workspace
 - [ ] GitHub Copilot instalado e ativo

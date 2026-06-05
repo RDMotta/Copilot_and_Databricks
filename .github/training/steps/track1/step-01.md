@@ -43,9 +43,9 @@ cd {{REPO}}
 ```bash
 python scripts/generate_sample_data.py
 ```
-Faça upload dos arquivos gerados para o Databricks DBFS:
-- `data/raw/orders.csv` → `dbfs:/FileStore/training/raw/orders.csv`
-- `data/raw/customers.csv` → `dbfs:/FileStore/training/raw/customers.csv`
+Faça upload dos arquivos gerados para o Volume da trilha:
+- `data/raw/orders.csv` → `dbfs:/Volumes/main/training_sql_serverless/raw_files/orders.csv`
+- `data/raw/customers.csv` → `dbfs:/Volumes/main/training_sql_serverless/raw_files/customers.csv`
 
 ---
 

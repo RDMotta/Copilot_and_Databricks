@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Script para gerar dados de exemplo para o treinamento.
-Execute localmente para criar os arquivos CSV que serão enviados ao DBFS.
+Execute localmente para criar os arquivos CSV que serão enviados ao Volume Unity Catalog.
 
 Uso:
     python scripts/generate_sample_data.py
@@ -156,9 +156,9 @@ if __name__ == "__main__":
     print("Gerando dados de exemplo...")
     write_csv("orders.csv", generate_orders())
     write_csv("customers.csv", generate_customers())
-    print("\nConcluído! Faça upload dos arquivos para o DBFS:")
-    print("  dbfs:/FileStore/training/raw/orders.csv")
-    print("  dbfs:/FileStore/training/raw/customers.csv")
+    print("\nConcluído! Faça upload dos arquivos para o Volume:")
+    print("  dbfs:/Volumes/main/training_sql_serverless/raw_files/orders.csv")
+    print("  dbfs:/Volumes/main/training_sql_serverless/raw_files/customers.csv")
     print("\nOu use o comando da CLI Databricks:")
-    print("  databricks fs cp data/raw/orders.csv dbfs:/FileStore/training/raw/orders.csv")
-    print("  databricks fs cp data/raw/customers.csv dbfs:/FileStore/training/raw/customers.csv")
+    print("  databricks fs cp data/raw/orders.csv dbfs:/Volumes/main/training_sql_serverless/raw_files/orders.csv")
+    print("  databricks fs cp data/raw/customers.csv dbfs:/Volumes/main/training_sql_serverless/raw_files/customers.csv")

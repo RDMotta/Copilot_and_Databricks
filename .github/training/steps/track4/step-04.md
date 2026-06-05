@@ -11,7 +11,7 @@ Parabens, @{{ACTOR}}! Voce concluiu o treinamento focado em conta free com SQL W
 ### Entregas realizadas
 
 - ✅ Setup e integracao do Databricks SQL no VS Code
-- ✅ Extracao de CSV do DBFS para Bronze SQL
+- ✅ Extracao de CSV do Volume para Bronze SQL
 - ✅ Limpeza e padronizacao na Silver SQL
 - ✅ ETL para Gold com KPIs de negocio
 

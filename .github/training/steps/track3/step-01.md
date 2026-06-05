@@ -26,7 +26,7 @@ Nesta trilha você vai aprender a **identificar e corrigir gargalos de performan
 ### 2. Gerar e enviar dados de exemplo
 ```bash
 make generate-data   # gera data/raw/orders.csv e customers.csv
-make upload-data     # envia para dbfs:/FileStore/training/raw/
+make upload-data     # envia para dbfs:/Volumes/main/training_sql_serverless/raw_files/
 ```
 
 ---

@@ -11,12 +11,11 @@ ifneq (,$(wildcard .env))
   export
 endif
 
-# Defaults para paths do DBFS (sobrescritos pelo .env se definidos)
-DBFS_TRAINING_ROOT  ?= /FileStore/training
-DBFS_RAW_PATH       ?= /FileStore/training/raw
-DBFS_BRONZE_PATH    ?= /FileStore/training/ecommerce_lakehouse/bronze
-DBFS_SILVER_PATH    ?= /FileStore/training/ecommerce_lakehouse/silver
-DBFS_GOLD_PATH      ?= /FileStore/training/ecommerce_lakehouse/gold
+# Defaults para paths do Volume (sobrescritos pelo .env se definidos)
+VOLUME_CATALOG      ?= main
+VOLUME_SCHEMA       ?= training_sql_serverless
+VOLUME_NAME         ?= raw_files
+VOLUME_RAW_PATH     ?= /Volumes/$(VOLUME_CATALOG)/$(VOLUME_SCHEMA)/$(VOLUME_NAME)
 
 help: ## Exibe esta ajuda
 	@echo ""
@@ -38,13 +37,13 @@ generate-data: ## Gera dados de exemplo em data/raw/
 
 # ── Databricks ────────────────────────────────────────────────────────────────
 
-upload-data: ## Faz upload dos dados de exemplo para o DBFS
-	@echo "☁️  Fazendo upload para o DBFS..."
+upload-data: ## Faz upload dos dados de exemplo para o Volume
+	@echo "☁️  Fazendo upload para o Volume..."
 	@[ -f data/raw/orders.csv ] || (echo "❌ Execute 'make generate-data' primeiro" && exit 1)
-	databricks fs mkdirs dbfs:$(DBFS_RAW_PATH)
-	databricks fs cp --overwrite data/raw/orders.csv    dbfs:$(DBFS_RAW_PATH)/orders.csv
-	databricks fs cp --overwrite data/raw/customers.csv dbfs:$(DBFS_RAW_PATH)/customers.csv
-	@echo "✅ Upload concluído em dbfs:$(DBFS_RAW_PATH)"
+	databricks fs mkdirs dbfs:$(VOLUME_RAW_PATH)
+	databricks fs cp --overwrite data/raw/orders.csv    dbfs:$(VOLUME_RAW_PATH)/orders.csv
+	databricks fs cp --overwrite data/raw/customers.csv dbfs:$(VOLUME_RAW_PATH)/customers.csv
+	@echo "✅ Upload concluído em dbfs:$(VOLUME_RAW_PATH)"
 
 cluster-start: ## Inicia o cluster Databricks
 	@[ -n "$(DATABRICKS_CLUSTER_ID)" ] || (echo "❌ DATABRICKS_CLUSTER_ID não definido no .env" && exit 1)

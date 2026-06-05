@@ -2,13 +2,18 @@
 -- MAGIC %md
 -- MAGIC # 01 - Setup e Extracao (Bronze SQL)
 -- MAGIC
--- MAGIC **Objetivo:** usar SQL Warehouse Serverless (2X-Small) para ler CSVs no DBFS e criar tabelas Bronze.
+-- MAGIC **Objetivo:** usar SQL Warehouse Serverless (2X-Small) para ler CSVs no Volume Unity Catalog e criar tabelas Bronze.
 
 -- COMMAND ----------
 
 -- 1) Criar schema da trilha
 CREATE SCHEMA IF NOT EXISTS training_sql_serverless;
 USE training_sql_serverless;
+
+-- COMMAND ----------
+
+-- 1.1) Criar volume de entrada para os arquivos CSV
+CREATE VOLUME IF NOT EXISTS main.training_sql_serverless.raw_files;
 
 -- COMMAND ----------
 
@@ -29,9 +34,9 @@ SELECT
   region,
   status,
   current_timestamp() AS _ingestion_timestamp,
-  'dbfs:/FileStore/training/raw/orders.csv' AS _source_file
+  'dbfs:/Volumes/main/training_sql_serverless/raw_files/orders.csv' AS _source_file
 FROM read_files(
-  'dbfs:/FileStore/training/raw/orders.csv',
+  'dbfs:/Volumes/main/training_sql_serverless/raw_files/orders.csv',
   format => 'csv',
   header => true,
   inferSchema => true
@@ -52,9 +57,9 @@ SELECT
   city,
   signup_date,
   current_timestamp() AS _ingestion_timestamp,
-  'dbfs:/FileStore/training/raw/customers.csv' AS _source_file
+  'dbfs:/Volumes/main/training_sql_serverless/raw_files/customers.csv' AS _source_file
 FROM read_files(
-  'dbfs:/FileStore/training/raw/customers.csv',
+  'dbfs:/Volumes/main/training_sql_serverless/raw_files/customers.csv',
   format => 'csv',
   header => true,
   inferSchema => true

@@ -9,7 +9,7 @@
 Nesta trilha voce vai executar um mini pipeline de dados usando apenas **Databricks SQL Warehouse** em conta free:
 
 ```
-CSV no DBFS
+CSV no Volume Unity Catalog
    ↓
 [Bronze SQL] dados brutos + auditoria
    ↓
@@ -47,8 +47,8 @@ make upload-data
 ```
 
 Os arquivos serao enviados para:
-- `dbfs:/FileStore/training/raw/orders.csv`
-- `dbfs:/FileStore/training/raw/customers.csv`
+- `dbfs:/Volumes/main/training_sql_serverless/raw_files/orders.csv`
+- `dbfs:/Volumes/main/training_sql_serverless/raw_files/customers.csv`
 
 ---
 
@@ -58,13 +58,14 @@ Abra `notebooks/05_sql_warehouse_serverless/01_sql_setup_and_extract.sql` e impl
 
 Objetivo desta etapa:
 - [ ] Criar schema SQL da trilha
-- [ ] Ler CSVs do DBFS com `read_files`
+- [ ] Criar o Volume Unity Catalog para os arquivos de entrada
+- [ ] Ler CSVs do Volume com `read_files`
 - [ ] Criar tabelas Bronze com colunas de auditoria
 - [ ] Validar contagem de registros
 
 ### 💡 Prompt Copilot sugerido
 
-> "Gere SQL para criar uma tabela bronze_orders_raw a partir de read_files no caminho dbfs:/FileStore/training/raw/orders.csv, adicionando colunas _ingestion_timestamp e _source_file."
+> "Gere SQL para criar uma tabela bronze_orders_raw a partir de read_files no caminho dbfs:/Volumes/main/training_sql_serverless/raw_files/orders.csv, adicionando colunas _ingestion_timestamp e _source_file."
 
 ### ▶️ Como avancar
 
