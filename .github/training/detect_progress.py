@@ -20,25 +20,30 @@ import sys
 # Mapeamento: trilha → [(padrão de arquivo, próxima etapa)]
 TRACK_TRIGGERS: dict[str, list[tuple[str, str]]] = {
     "track-1-full": [
-        ("notebooks/01_intro/",                                       "02"),
-        ("notebooks/02_copilot_integration/01_pyspark_with_copilot",  "03"),
-        ("notebooks/02_copilot_integration/02_sql_with_copilot",      "04"),
-        ("notebooks/03_pipeline_optimization/01_baseline_pipeline",   "05"),
-        ("notebooks/03_pipeline_optimization/02_profiling",           "06"),
-        ("notebooks/03_pipeline_optimization/03_optimized_pipeline",  "07"),
-        ("notebooks/04_project_hands_on/01_bronze_ingestion",         "08"),
-        ("notebooks/04_project_hands_on/02_silver_transform",         "09"),
-        ("notebooks/04_project_hands_on/03_gold_analytics",           "10"),
+        ("notebooks/01_intro/", "02"),
+        ("notebooks/02_copilot_integration/01_pyspark_with_copilot", "03"),
+        ("notebooks/02_copilot_integration/02_sql_with_copilot", "04"),
+        ("notebooks/03_pipeline_optimization/01_baseline_pipeline", "05"),
+        ("notebooks/03_pipeline_optimization/02_profiling", "06"),
+        ("notebooks/03_pipeline_optimization/03_optimized_pipeline", "07"),
+        ("notebooks/04_project_hands_on/01_bronze_ingestion", "08"),
+        ("notebooks/04_project_hands_on/02_silver_transform", "09"),
+        ("notebooks/04_project_hands_on/03_gold_analytics", "10"),
     ],
     "track-2-handson": [
         ("notebooks/04_project_hands_on/01_bronze_ingestion", "02"),
         ("notebooks/04_project_hands_on/02_silver_transform", "03"),
-        ("notebooks/04_project_hands_on/03_gold_analytics",   "04"),
+        ("notebooks/04_project_hands_on/03_gold_analytics", "04"),
     ],
     "track-3-optimization": [
-        ("notebooks/03_pipeline_optimization/01_baseline_pipeline",  "02"),
-        ("notebooks/03_pipeline_optimization/02_profiling",          "03"),
+        ("notebooks/03_pipeline_optimization/01_baseline_pipeline", "02"),
+        ("notebooks/03_pipeline_optimization/02_profiling", "03"),
         ("notebooks/03_pipeline_optimization/03_optimized_pipeline", "04"),
+    ],
+    "track-4-sql-serverless": [
+        ("notebooks/05_sql_warehouse_serverless/01_sql_setup_and_extract", "02"),
+        ("notebooks/05_sql_warehouse_serverless/02_sql_cleaning_etl", "03"),
+        ("notebooks/05_sql_warehouse_serverless/03_sql_gold_validation", "04"),
     ],
 }
 
