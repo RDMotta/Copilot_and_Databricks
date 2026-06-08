@@ -65,7 +65,7 @@ WHERE rn = 1;
 CREATE OR REPLACE TABLE silver_customers_clean AS
 SELECT
   CAST(customer_id AS STRING) AS customer_id,
-  TRIM(CAST(customer_name AS STRING)) AS customer_name,
+  TRIM(CAST(name AS STRING)) AS customer_name,
   LOWER(TRIM(CAST(email AS STRING))) AS email,
   LOWER(TRIM(CAST(city AS STRING))) AS city,
   TO_DATE(signup_date) AS signup_date,
