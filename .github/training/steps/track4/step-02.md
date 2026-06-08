@@ -10,6 +10,8 @@ Agora que a Bronze esta pronta, transforme os dados em uma camada Silver confiav
 
 Abra `notebooks/05_sql_warehouse_serverless/02_sql_cleaning_etl.sql`.
 
+Neste arquivo você precisa implementar a consulta "TODO" para criar a tabela `silver_orders_clean` aplicando as seguintes regras:
+
 ### 🎯 O que implementar
 
 - [ ] Criar `silver_orders_clean` com:
@@ -24,7 +26,7 @@ Abra `notebooks/05_sql_warehouse_serverless/02_sql_cleaning_etl.sql`.
 
 ### 💡 Prompt Copilot sugerido
 
-> "Escreva SQL com CTE para deduplicar pedidos por order_id usando row_number e manter o registro mais recente por order_date. Depois calcule total_amount e filtre quantity entre 1 e 100."
+> "Gerar SQL para criar silver_orders_clean a partir de bronze_orders_raw aplicando casts/normalização, filtros (quantity 1–100, unit_price 0.01–50000, status='completed'), deduplicação por order_id mantendo o mais recente, e calculando total_amount arredondado"
 
 ### ✅ Validacao esperada
 
