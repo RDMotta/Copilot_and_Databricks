@@ -13,7 +13,7 @@ USE training_sql_serverless;
 -- COMMAND ----------
 
 -- 1.1) Criar volume de entrada para os arquivos CSV
-CREATE VOLUME IF NOT EXISTS main.training_sql_serverless.raw_files;
+CREATE VOLUME IF NOT EXISTS workspace.training_sql_serverless.raw_files;
 
 -- COMMAND ----------
 
@@ -34,7 +34,7 @@ SELECT
   region,
   status,
   current_timestamp() AS _ingestion_timestamp,
-  'dbfs:/Volumes/workspace/training_sql_serverless/raw_files/orders.csv' AS _source_file
+  input_file_name() AS _source_file
 FROM read_files(
   'dbfs:/Volumes/workspace/training_sql_serverless/raw_files/orders.csv',
   format => 'csv',
@@ -52,7 +52,7 @@ FROM read_files(
 CREATE OR REPLACE TABLE bronze_customers_raw AS
 SELECT
   customer_id,
-  customer_name,
+  name,
   email,
   city,
   signup_date,
