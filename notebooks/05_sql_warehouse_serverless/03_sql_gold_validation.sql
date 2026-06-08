@@ -14,16 +14,7 @@ USE training_sql_serverless;
 -- MAGIC ## Gold 1: KPIs diarios
 
 -- COMMAND ----------
-
-CREATE OR REPLACE TABLE gold_daily_kpis AS
-SELECT
-  DATE(order_date) AS order_day,
-  COUNT(DISTINCT order_id) AS orders_count,
-  ROUND(SUM(total_amount), 2) AS revenue_total,
-  ROUND(AVG(total_amount), 2) AS avg_ticket
-FROM silver_orders_enriched
-GROUP BY DATE(order_date)
-ORDER BY order_day;
+-- TODO: Copilot vai completar
 
 -- COMMAND ----------
 

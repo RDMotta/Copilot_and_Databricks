@@ -3,7 +3,7 @@
 # Comandos de conveniência para uso no Codespaces
 # ════════════════════════════════════════════════════════════════════
 
-.PHONY: help setup generate-data upload-data test-spark test lint format clean
+.PHONY: help setup generate-data create-volume upload-data test-spark test lint format clean
 
 # Carrega variáveis do .env se existir
 ifneq (,$(wildcard .env))
@@ -11,12 +11,11 @@ ifneq (,$(wildcard .env))
   export
 endif
 
-# Defaults para paths do DBFS (sobrescritos pelo .env se definidos)
-DBFS_TRAINING_ROOT  ?= /FileStore/training
-DBFS_RAW_PATH       ?= /FileStore/training/raw
-DBFS_BRONZE_PATH    ?= /FileStore/training/ecommerce_lakehouse/bronze
-DBFS_SILVER_PATH    ?= /FileStore/training/ecommerce_lakehouse/silver
-DBFS_GOLD_PATH      ?= /FileStore/training/ecommerce_lakehouse/gold
+# Defaults para paths do Volume (sobrescritos pelo .env se definidos)
+VOLUME_CATALOG      ?= workspace
+VOLUME_SCHEMA       ?= training_sql_serverless
+VOLUME_NAME         ?= raw_files
+VOLUME_RAW_PATH     ?= /Volumes/$(VOLUME_CATALOG)/$(VOLUME_SCHEMA)/$(VOLUME_NAME)
 
 help: ## Exibe esta ajuda
 	@echo ""
@@ -29,22 +28,38 @@ help: ## Exibe esta ajuda
 
 setup: ## Instala dependências e configura o ambiente
 	@echo "📦 Instalando dependências Python..."
-	pip install --quiet -r requirements.txt
+	python3 -m pip install --quiet -r requirements.txt
 	@echo "✅ Setup concluído."
 
 generate-data: ## Gera dados de exemplo em data/raw/
 	@echo "📊 Gerando dados de exemplo..."
-	python scripts/generate_sample_data.py
+	python3 scripts/generate_sample_data.py
 
 # ── Databricks ────────────────────────────────────────────────────────────────
 
-upload-data: ## Faz upload dos dados de exemplo para o DBFS
-	@echo "☁️  Fazendo upload para o DBFS..."
+create-volume: ## Cria schema e volume no Unity Catalog (idempotente)
+	@[ -n "$(DATABRICKS_HOST)" ]  || (echo "❌ DATABRICKS_HOST não definido no .env" && exit 1)
+	@[ -n "$(DATABRICKS_TOKEN)" ] || (echo "❌ DATABRICKS_TOKEN não definido no .env" && exit 1)
+	@echo "🗄️  Garantindo schema e volume no Unity Catalog..."
+	@curl -sf -X POST "$(DATABRICKS_HOST)/api/2.1/unity-catalog/schemas" \
+	  -H "Authorization: Bearer $(DATABRICKS_TOKEN)" \
+	  -H "Content-Type: application/json" \
+	  -d "{\"catalog_name\":\"$(VOLUME_CATALOG)\",\"name\":\"$(VOLUME_SCHEMA)\"}" \
+	  >/dev/null 2>&1 || true
+	@curl -sf -X POST "$(DATABRICKS_HOST)/api/2.1/unity-catalog/volumes" \
+	  -H "Authorization: Bearer $(DATABRICKS_TOKEN)" \
+	  -H "Content-Type: application/json" \
+	  -d "{\"catalog_name\":\"$(VOLUME_CATALOG)\",\"schema_name\":\"$(VOLUME_SCHEMA)\",\"name\":\"$(VOLUME_NAME)\",\"volume_type\":\"MANAGED\"}" \
+	  >/dev/null 2>&1 || true
+	@echo "✅ Volume $(VOLUME_CATALOG).$(VOLUME_SCHEMA).$(VOLUME_NAME) pronto"
+
+upload-data: create-volume ## Faz upload dos dados de exemplo para o Volume
+	@echo "☁️  Fazendo upload para o Volume..."
 	@[ -f data/raw/orders.csv ] || (echo "❌ Execute 'make generate-data' primeiro" && exit 1)
-	databricks fs mkdirs dbfs:$(DBFS_RAW_PATH)
-	databricks fs cp --overwrite data/raw/orders.csv    dbfs:$(DBFS_RAW_PATH)/orders.csv
-	databricks fs cp --overwrite data/raw/customers.csv dbfs:$(DBFS_RAW_PATH)/customers.csv
-	@echo "✅ Upload concluído em dbfs:$(DBFS_RAW_PATH)"
+	databricks fs mkdirs dbfs:$(VOLUME_RAW_PATH)
+	databricks fs cp --overwrite data/raw/orders.csv    dbfs:$(VOLUME_RAW_PATH)/orders.csv
+	databricks fs cp --overwrite data/raw/customers.csv dbfs:$(VOLUME_RAW_PATH)/customers.csv
+	@echo "✅ Upload concluído em dbfs:$(VOLUME_RAW_PATH)"
 
 cluster-start: ## Inicia o cluster Databricks
 	@[ -n "$(DATABRICKS_CLUSTER_ID)" ] || (echo "❌ DATABRICKS_CLUSTER_ID não definido no .env" && exit 1)
@@ -63,7 +78,7 @@ databricks-check: ## Verifica a conexão com o Databricks
 
 # ── Spark Local ───────────────────────────────────────────────────────────────
 
-test-spark: ## Testa PySpark local com Delta Lake
+test-spark: ## Testa Spark local (ou Databricks Connect, se instalado)
 	@echo "🔥 Testando PySpark + Delta Lake localmente..."
 	python3 scripts/test_spark.py
 

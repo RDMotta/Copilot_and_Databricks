@@ -15,7 +15,7 @@ Este treinamento apresenta a integração entre **Databricks** e **GitHub Copilo
 - Arquitetura Databricks: Clusters, Notebooks, Delta Lake, Unity Catalog
 
 ### Módulo 2 — Setup do Ambiente (20 min)
-- Criando conta gratuita no Databricks Community Edition
+- Criando conta gratuita no Databricks Free Edition
 - Configurando o VS Code com extensão Databricks
 - Instalando e configurando o GitHub Copilot no VS Code
 - Conectando VS Code ao workspace Databricks
@@ -159,8 +159,9 @@ databricks-treinner/
 
 O Codespace já vem pré-configurado com:
 - ☕ Java 11 + PySpark 3.5.1 + Delta Lake (via pip, sem download de binário)
-- 🐍 Python 3.11
+- 🐍 Python 3.12
 - 🔧 Databricks CLI
+- 🔌 Databricks Connect
 - ⚡ GitHub Copilot + Copilot Chat
 - 🗄️ Extensão Databricks para VS Code
 - 📊 Jupyter Notebook support
@@ -182,11 +183,11 @@ Antes de abrir o Codespace, configure os secrets em:
 
 Se preferir rodar localmente em vez do Codespaces:
 
-- Conta gratuita no [Databricks Community Edition](https://community.cloud.databricks.com/login.html)
+- Conta gratuita no [Databricks Free Edition](https://login.databricks.com/?dbx_source=docs&intent=CE_SIGN_UP)
 - VS Code instalado
 - Extensão [Databricks para VS Code](https://marketplace.visualstudio.com/items?itemName=databricks.databricks)
 - GitHub Copilot (licença ativa ou trial)
-- Python 3.9+ e Java 11+
+- Python 3.12+ e Java 11+
 
 ---
 
@@ -210,7 +211,7 @@ Se preferir rodar localmente em vez do Codespaces:
 
 ## Links Úteis
 
-- [Databricks Community Edition](https://community.cloud.databricks.com/)
+- [Databricks Free Edition](https://docs.databricks.com/aws/en/getting-started/free-edition)
 - [Documentação Databricks](https://docs.databricks.com/)
 - [GitHub Copilot Docs](https://docs.github.com/en/copilot)
 - [Extensão Databricks VS Code](https://docs.databricks.com/dev-tools/vs-code-ext.html)

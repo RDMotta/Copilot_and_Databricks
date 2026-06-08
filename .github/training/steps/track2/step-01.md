@@ -26,20 +26,28 @@ CSV (fonte)
 
 ## ✅ Setup (Faça isso primeiro)
 
-### 1. Databricks Community Edition
-- [ ] Acesse https://community.cloud.databricks.com/ e crie sua conta gratuita
-- [ ] Crie um cluster: **Compute → Create compute → Single Node → Runtime 14.x LTS**
-- [ ] Aguarde o cluster ficar verde ✅
+### 1. Databricks Free Edition
+- [ ] Acesse https://login.databricks.com/?dbx_source=docs&intent=CE_SIGN_UP e crie sua conta gratuita no Databricks Free Edition
+- [ ] Crie um compute serverless disponível na Free Edition
+- [ ] Aguarde o compute ficar verde ✅
 
 ### 2. Codespaces / VS Code
 O ambiente já vem configurado! Abra o Codespaces deste repositório:
 - [ ] GitHub Copilot ativo (Ctrl+Alt+I abre o Chat)
 - [ ] Extensão Databricks conectada ao seu workspace
 
+### 2.1. Criar o Volume da trilha
+No Databricks SQL ou no notebook de setup, crie a área de entrada:
+
+```sql
+CREATE SCHEMA IF NOT EXISTS main.training_sql_serverless;
+CREATE VOLUME IF NOT EXISTS main.training_sql_serverless.raw_files;
+```
+
 ### 3. Gerar e enviar dados de exemplo
 ```bash
 make generate-data   # gera data/raw/orders.csv e customers.csv
-make upload-data     # envia para dbfs:/FileStore/training/raw/
+make upload-data     # envia para /Volumes/workspace/training_sql_serverless/raw_files/
 ```
 
 ---

@@ -1,4 +1,5 @@
 .env
+.venv/
 data/raw/*.csv
 data/processed/
 __pycache__/
@@ -13,3 +14,5 @@ build/
 .DS_Store
 *.log
 /tmp/
+
+.databricks

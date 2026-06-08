@@ -30,9 +30,12 @@ jobs:
             const stepLabel = 't4-step-01';
 
             const labelsToCreate = [
-              { name: 'databricks-training', color: '1f6feb', description: 'Treinamento Databricks + Copilot' },
-              { name: trackLabel,            color: '0052cc', description: 'Trilha 4 - SQL Warehouse Serverless (Conta Free)' },
-              { name: stepLabel,             color: 'e4e669', description: 'Etapa atual do treinamento' },
+              { name: 'databricks-training',    color: 'e4e669', description: 'Treinamento Databricks + Copilot' },
+              { name: trackLabel,               color: 'fb8500', description: 'Trilha 4 - SQL Warehouse Serverless (Conta Free)' },
+              { name: 't4-step-01',             color: 'fb8500', description: 'T4 Etapa 1: Setup + Bronze SQL' },
+              { name: 't4-step-02',             color: 'fb8500', description: 'T4 Etapa 2: Silver ETL' },
+              { name: 't4-step-03',             color: 'fb8500', description: 'T4 Etapa 3: Gold SQL' },
+              { name: 't4-step-04',             color: '0e8a16', description: 'T4 Concluído!' },
             ];
 
             for (const label of labelsToCreate) {

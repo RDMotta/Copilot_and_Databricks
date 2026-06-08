@@ -18,13 +18,19 @@
 
 # COMMAND ----------
 
+from datetime import datetime
+
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 from pyspark.sql.types import (
-    StructType, StructField, StringType, IntegerType,
-    DoubleType, TimestampType, ArrayType
+    ArrayType,
+    DoubleType,
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
 )
-from datetime import datetime
 
 # COMMAND ----------
 
@@ -54,6 +60,7 @@ from datetime import datetime
 
 # COMMAND ----------
 
+
 # Função de limpeza de pedidos conforme especificação acima
 def clean_orders(df: DataFrame) -> DataFrame:
     # TODO: Copilot vai completar esta função
@@ -71,6 +78,7 @@ def clean_orders(df: DataFrame) -> DataFrame:
 # MAGIC > ticket médio e quantidade média por pedido. Ordene por receita total decrescente."*
 
 # COMMAND ----------
+
 
 # Função para calcular métricas de vendas por categoria
 def calculate_sales_metrics(df: DataFrame) -> DataFrame:
@@ -90,6 +98,7 @@ def calculate_sales_metrics(df: DataFrame) -> DataFrame:
 
 # COMMAND ----------
 
+
 # Análise temporal com window functions
 def analyze_sales_by_period(df: DataFrame) -> DataFrame:
     # TODO: Copilot vai completar usando Window functions do PySpark
@@ -107,6 +116,7 @@ def analyze_sales_by_period(df: DataFrame) -> DataFrame:
 # MAGIC > Use when/otherwise do PySpark e window functions para calcular o total por cliente"*
 
 # COMMAND ----------
+
 
 # Segmentação de clientes por receita
 def segment_customers(df: DataFrame) -> DataFrame:
@@ -140,16 +150,16 @@ def segment_customers(df: DataFrame) -> DataFrame:
 # MAGIC ## Salvar Resultados em Delta Lake
 # MAGIC
 # MAGIC > 💡 **Prompt para o Copilot:**
-# MAGIC > *"Salve cada DataFrame resultado em Delta Lake no DBFS em /FileStore/training/results/,
+# MAGIC > *"Salve cada DataFrame resultado em Delta Lake no DBFS em /Volumes/workspace/training_sql_serverless/results/,
 # MAGIC > usando o nome da tabela como subpasta. Use modo overwrite."*
 
 # COMMAND ----------
 
 # Salve os resultados em Delta Lake
 # Caminhos sugeridos:
-# - /FileStore/training/results/sales_metrics/
-# - /FileStore/training/results/sales_by_period/
-# - /FileStore/training/results/customer_segments/
+# - /Volumes/workspace/training_sql_serverless/results/sales_metrics/
+# - /Volumes/workspace/training_sql_serverless/results/sales_by_period/
+# - /Volumes/workspace/training_sql_serverless/results/customer_segments/
 
 # TODO: Copilot vai completar o código de escrita
 

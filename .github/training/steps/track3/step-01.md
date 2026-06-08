@@ -19,14 +19,22 @@ Nesta trilha você vai aprender a **identificar e corrigir gargalos de performan
 
 ## ✅ Setup (Faça isso primeiro)
 
-### 1. Databricks Community Edition
-- [ ] Acesse https://community.cloud.databricks.com/ e crie sua conta gratuita
-- [ ] Crie um cluster: **Compute → Create compute → Single Node → Runtime 14.x LTS**
+### 1. Databricks Free Edition
+- [ ] Acesse https://login.databricks.com/?dbx_source=docs&intent=CE_SIGN_UP e crie sua conta gratuita no Databricks Free Edition
+- [ ] Crie um compute serverless disponível na Free Edition
 
-### 2. Gerar e enviar dados de exemplo
+### 2. Criar o Volume da trilha
+Antes de começar o baseline, crie a pasta de entrada no Unity Catalog:
+
+```sql
+CREATE SCHEMA IF NOT EXISTS main.training_sql_serverless;
+CREATE VOLUME IF NOT EXISTS main.training_sql_serverless.raw_files;
+```
+
+### 3. Gerar e enviar dados de exemplo
 ```bash
 make generate-data   # gera data/raw/orders.csv e customers.csv
-make upload-data     # envia para dbfs:/FileStore/training/raw/
+make upload-data     # envia para /Volumes/workspace/training_sql_serverless/raw_files/
 ```
 
 ---

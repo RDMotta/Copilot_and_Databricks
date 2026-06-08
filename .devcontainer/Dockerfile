@@ -1,5 +1,5 @@
-# ── Base: Python 3.11 com ferramentas de desenvolvimento ─────────────────────
-FROM mcr.microsoft.com/devcontainers/python:3.11-bullseye
+# ── Base: Python 3.12 com ferramentas de desenvolvimento ─────────────────────
+FROM mcr.microsoft.com/devcontainers/python:3.12-bullseye
 
 # ── Variáveis de ambiente ─────────────────────────────────────────────────────
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -12,7 +12,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # ── 1. Java 11 (necessário para PySpark) ─────────────────────────────────────
 # OpenJDK do Debian: mais rápido que baixar Temurin e suficiente para PySpark
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN rm -f /etc/apt/sources.list.d/yarn.list /etc/apt/sources.list.d/yarn.list.save 2>/dev/null \
+    && apt-get update && apt-get install -y --no-install-recommends \
     default-jdk-headless \
     curl \
     unzip \

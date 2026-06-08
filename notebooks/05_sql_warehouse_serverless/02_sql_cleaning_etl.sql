@@ -14,46 +14,8 @@ USE training_sql_serverless;
 -- MAGIC ## Silver de pedidos: padronizacao, filtros e deduplicacao
 
 -- COMMAND ----------
+-- TODO: Copilot deve completar
 
-CREATE OR REPLACE TABLE silver_orders_clean AS
-WITH typed AS (
-  SELECT
-    CAST(order_id AS STRING) AS order_id,
-    CAST(customer_id AS STRING) AS customer_id,
-    LOWER(TRIM(CAST(product_category AS STRING))) AS product_category,
-    TRIM(CAST(product_name AS STRING)) AS product_name,
-    CAST(quantity AS INT) AS quantity,
-    CAST(unit_price AS DOUBLE) AS unit_price,
-    TO_TIMESTAMP(order_date) AS order_ts,
-    LOWER(TRIM(CAST(region AS STRING))) AS region,
-    LOWER(TRIM(CAST(status AS STRING))) AS status
-  FROM bronze_orders_raw
-),
-filtered AS (
-  SELECT *
-  FROM typed
-  WHERE quantity BETWEEN 1 AND 100
-    AND unit_price BETWEEN 0.01 AND 50000
-    AND status = 'completed'
-),
-dedup AS (
-  SELECT *,
-         ROW_NUMBER() OVER (PARTITION BY order_id ORDER BY order_ts DESC) AS rn
-  FROM filtered
-)
-SELECT
-  order_id,
-  customer_id,
-  product_category,
-  product_name,
-  quantity,
-  unit_price,
-  order_ts AS order_date,
-  region,
-  status,
-  ROUND(quantity * unit_price, 2) AS total_amount
-FROM dedup
-WHERE rn = 1;
 
 -- COMMAND ----------
 
@@ -65,7 +27,7 @@ WHERE rn = 1;
 CREATE OR REPLACE TABLE silver_customers_clean AS
 SELECT
   CAST(customer_id AS STRING) AS customer_id,
-  TRIM(CAST(customer_name AS STRING)) AS customer_name,
+  TRIM(CAST(name AS STRING)) AS customer_name,
   LOWER(TRIM(CAST(email AS STRING))) AS email,
   LOWER(TRIM(CAST(city AS STRING))) AS city,
   TO_DATE(signup_date) AS signup_date,

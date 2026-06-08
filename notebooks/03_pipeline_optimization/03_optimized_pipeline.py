@@ -20,17 +20,25 @@
 
 # COMMAND ----------
 
+import time
+
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 from pyspark.sql.types import (
-    StructType, StructField, StringType, IntegerType, DoubleType, TimestampType
+    DoubleType,
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
 )
-import time
 
-RAW_ORDERS_PATH    = "/FileStore/training/raw/orders.csv"
-RAW_CUSTOMERS_PATH = "/FileStore/training/raw/customers.csv"
-DELTA_BASE         = "/FileStore/training/delta"
-RESULTS_BASE       = "/FileStore/training/optimized"
+RAW_ORDERS_PATH = "/Volumes/workspace/training_sql_serverless/raw_files/orders.csv"
+RAW_CUSTOMERS_PATH = (
+    "/Volumes/workspace/training_sql_serverless/raw_files/customers.csv"
+)
+DELTA_BASE = "/Volumes/workspace/training_sql_serverless/delta"
+RESULTS_BASE = "/Volumes/workspace/training_sql_serverless/optimized"
 
 # COMMAND ----------
 
@@ -49,10 +57,16 @@ n_cores = sc.defaultParallelism
 optimal_partitions = n_cores * 2
 
 spark.conf.set("spark.sql.shuffle.partitions", str(optimal_partitions))
-spark.conf.set("spark.sql.adaptive.enabled", "true")             # AQE
-spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", "true")  # Consolida partições pequenas
-spark.conf.set("spark.sql.adaptive.skewJoin.enabled", "true")   # Corrige skew automaticamente
-spark.conf.set("spark.databricks.delta.optimizeWrite.enabled", "true")   # Otimiza escrita Delta
+spark.conf.set("spark.sql.adaptive.enabled", "true")  # AQE
+spark.conf.set(
+    "spark.sql.adaptive.coalescePartitions.enabled", "true"
+)  # Consolida partições pequenas
+spark.conf.set(
+    "spark.sql.adaptive.skewJoin.enabled", "true"
+)  # Corrige skew automaticamente
+spark.conf.set(
+    "spark.databricks.delta.optimizeWrite.enabled", "true"
+)  # Otimiza escrita Delta
 
 print(f"Cores: {n_cores}")
 print(f"Shuffle partitions ajustado para: {optimal_partitions}")
@@ -69,31 +83,39 @@ print(f"Shuffle partitions ajustado para: {optimal_partitions}")
 # COMMAND ----------
 
 # Schemas explícitos — evita o scan duplo do inferSchema
-orders_schema = StructType([
-    StructField("order_id",         StringType(),  False),
-    StructField("customer_id",      StringType(),  False),
-    StructField("product_category", StringType(),  True),
-    StructField("product_name",     StringType(),  True),
-    StructField("quantity",         IntegerType(), True),
-    StructField("unit_price",       DoubleType(),  True),
-    StructField("order_date",       StringType(),  True),
-    StructField("region",           StringType(),  True),
-    StructField("status",           StringType(),  True),
-])
+orders_schema = StructType(
+    [
+        StructField("order_id", StringType(), False),
+        StructField("customer_id", StringType(), False),
+        StructField("product_category", StringType(), True),
+        StructField("product_name", StringType(), True),
+        StructField("quantity", IntegerType(), True),
+        StructField("unit_price", DoubleType(), True),
+        StructField("order_date", StringType(), True),
+        StructField("region", StringType(), True),
+        StructField("status", StringType(), True),
+    ]
+)
 
-customers_schema = StructType([
-    StructField("customer_id",  StringType(), False),
-    StructField("name",         StringType(), True),
-    StructField("email",        StringType(), True),
-    StructField("city",         StringType(), True),
-    StructField("signup_date",  StringType(), True),
-    StructField("segment",      StringType(), True),
-])
+customers_schema = StructType(
+    [
+        StructField("customer_id", StringType(), False),
+        StructField("name", StringType(), True),
+        StructField("email", StringType(), True),
+        StructField("city", StringType(), True),
+        StructField("signup_date", StringType(), True),
+        StructField("segment", StringType(), True),
+    ]
+)
 
 t_start = time.time()
 
-df_orders    = spark.read.schema(orders_schema).option("header", "true").csv(RAW_ORDERS_PATH)
-df_customers = spark.read.schema(customers_schema).option("header", "true").csv(RAW_CUSTOMERS_PATH)
+df_orders = (
+    spark.read.schema(orders_schema).option("header", "true").csv(RAW_ORDERS_PATH)
+)
+df_customers = (
+    spark.read.schema(customers_schema).option("header", "true").csv(RAW_CUSTOMERS_PATH)
+)
 
 t_read = time.time()
 print(f"Leitura com schema explícito: {t_read - t_start:.2f}s")
@@ -111,23 +133,30 @@ print(f"Leitura com schema explícito: {t_read - t_start:.2f}s")
 
 # Limpeza com todos os filtros encadeados (Spark os combina em um único scan)
 df_orders_clean = (
-    df_orders
-    .dropDuplicates(["order_id"])
+    df_orders.dropDuplicates(["order_id"])
     .filter(
-        (F.col("status") == "completed") &
-        (F.col("quantity") > 0) &
-        (F.col("unit_price") > 0)
+        (F.col("status") == "completed")
+        & (F.col("quantity") > 0)
+        & (F.col("unit_price") > 0)
     )
-    .withColumn("total_amount",      F.round(F.col("quantity") * F.col("unit_price"), 2))
-    .withColumn("product_category",  F.lower(F.col("product_category")))
-    .withColumn("order_date",        F.col("order_date").cast(TimestampType()))
-    .withColumn("order_year",        F.year("order_date"))
-    .withColumn("order_month",       F.month("order_date"))
+    .withColumn("total_amount", F.round(F.col("quantity") * F.col("unit_price"), 2))
+    .withColumn("product_category", F.lower(F.col("product_category")))
+    .withColumn("order_date", F.col("order_date").cast(TimestampType()))
+    .withColumn("order_year", F.year("order_date"))
+    .withColumn("order_month", F.month("order_date"))
     .select(
-        "order_id", "customer_id", "product_category", "product_name",
-        "quantity", "unit_price", "total_amount",
-        "order_date", "order_year", "order_month",
-        "region", "status"
+        "order_id",
+        "customer_id",
+        "product_category",
+        "product_name",
+        "quantity",
+        "unit_price",
+        "total_amount",
+        "order_date",
+        "order_year",
+        "order_month",
+        "region",
+        "status",
     )
     .cache()  # ← Cache estratégico: será usado em join + 3 aggregações
 )
@@ -149,15 +178,11 @@ print(f"Limpeza + Cache: {t_clean - t_read:.2f}s | Pedidos válidos: {n_orders}"
 # COMMAND ----------
 
 # Broadcast Join — elimina o SortMergeJoin e o shuffle de clientes
-df_enriched = (
-    df_orders_clean
-    .join(
-        F.broadcast(df_customers),  # ← Força Broadcast Hash Join
-        on="customer_id",
-        how="left"
-    )
-    .cache()  # ← Cache do resultado do join para as 3 aggregações seguintes
-)
+df_enriched = df_orders_clean.join(
+    F.broadcast(df_customers),  # ← Força Broadcast Hash Join
+    on="customer_id",
+    how="left",
+).cache()  # ← Cache do resultado do join para as 3 aggregações seguintes
 
 # Materialize
 n_enriched = df_enriched.count()
@@ -180,8 +205,7 @@ df_enriched.explain()
 
 # As três aggregações agora leem do cache (sem rescan dos CSVs)
 df_by_category = (
-    df_enriched
-    .groupBy("product_category")
+    df_enriched.groupBy("product_category")
     .agg(
         F.count("order_id").alias("total_orders"),
         F.sum("total_amount").alias("total_revenue"),
@@ -192,8 +216,7 @@ df_by_category = (
 )
 
 df_by_region = (
-    df_enriched
-    .groupBy("region")
+    df_enriched.groupBy("region")
     .agg(
         F.count("order_id").alias("total_orders"),
         F.sum("total_amount").alias("total_revenue"),
@@ -203,8 +226,7 @@ df_by_region = (
 )
 
 df_by_period = (
-    df_enriched
-    .groupBy("order_year", "order_month")
+    df_enriched.groupBy("order_year", "order_month")
     .agg(
         F.count("order_id").alias("total_orders"),
         F.sum("total_amount").alias("total_revenue"),
@@ -227,17 +249,19 @@ print(f"Aggregações (3x): {t_agg - t_join:.2f}s")
 # COMMAND ----------
 
 # Escrita em Delta Lake (formato colunar com compressão e statistics)
-df_by_category.write.format("delta").mode("overwrite").save(f"{RESULTS_BASE}/by_category")
+df_by_category.write.format("delta").mode("overwrite").save(
+    f"{RESULTS_BASE}/by_category"
+)
 df_by_region.write.format("delta").mode("overwrite").save(f"{RESULTS_BASE}/by_region")
 
 # Tabela de períodos particionada por ano
-df_by_period.write.format("delta").mode("overwrite").partitionBy("order_year").save(f"{RESULTS_BASE}/by_period")
+df_by_period.write.format("delta").mode("overwrite").partitionBy("order_year").save(
+    f"{RESULTS_BASE}/by_period"
+)
 
 # Dataset enriquecido completo — particionado por ano e categoria para queries futuras
 (
-    df_enriched
-    .write
-    .format("delta")
+    df_enriched.write.format("delta")
     .mode("overwrite")
     .partitionBy("order_year", "product_category")
     .save(f"{DELTA_BASE}/orders_enriched")
@@ -258,7 +282,9 @@ print(f"Escrita Delta Lake: {t_write - t_agg:.2f}s")
 # COMMAND ----------
 
 # Registrar tabela Delta no Catálogo para usar SQL
-spark.sql(f"CREATE TABLE IF NOT EXISTS training.orders_enriched USING DELTA LOCATION '{DELTA_BASE}/orders_enriched'")
+spark.sql(
+    f"CREATE TABLE IF NOT EXISTS training.orders_enriched USING DELTA LOCATION '{DELTA_BASE}/orders_enriched'"
+)
 
 # OPTIMIZE compacta arquivos pequenos em arquivos maiores
 # ZORDER cria índice multidimensional para queries rápidas por customer_id e order_date

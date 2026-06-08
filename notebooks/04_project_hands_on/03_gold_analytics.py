@@ -20,7 +20,7 @@
 from pyspark.sql import DataFrame, Window
 from pyspark.sql import functions as F
 
-GOLD_PATH = "/FileStore/training/ecommerce_lakehouse/gold"
+GOLD_PATH = "/Volumes/workspace/training_sql_serverless/ecommerce_lakehouse/gold"
 spark.sql("USE ecommerce_lakehouse")
 
 # COMMAND ----------
@@ -47,6 +47,7 @@ display(df_silver.limit(3))
 
 # COMMAND ----------
 
+
 def build_executive_kpis(df: DataFrame) -> DataFrame:
     """Constrói tabela de KPIs executivos — uma linha com todos os indicadores globais."""
     # TODO: Copilot vai completar — use agg() com múltiplas métricas
@@ -67,6 +68,7 @@ display(df_gold_kpis)
 # MAGIC > Use window functions para calcular percentual e ranking."*
 
 # COMMAND ----------
+
 
 def build_category_performance(df: DataFrame) -> DataFrame:
     """
@@ -90,6 +92,7 @@ display(df_gold_category)
 # MAGIC > e média móvel de 3 meses."*
 
 # COMMAND ----------
+
 
 def build_monthly_trend(df: DataFrame) -> DataFrame:
     """
@@ -120,11 +123,12 @@ display(df_gold_monthly)
 
 # COMMAND ----------
 
+
 def build_rfm_analysis(df: DataFrame) -> DataFrame:
     """
     Segmentação RFM de clientes com scores e classificação.
     """
-    from pyspark.sql.functions import datediff, current_date, ntile, when
+    from pyspark.sql.functions import current_date, datediff, ntile, when
 
     # Calcular métricas RFM base
     # TODO: Copilot vai completar o cálculo de R, F, M e scores
@@ -152,6 +156,7 @@ display(df_gold_rfm)
 
 # COMMAND ----------
 
+
 # TODO: Copilot vai completar esta função
 def build_regional_summary(df: DataFrame) -> DataFrame:
     pass
@@ -168,11 +173,11 @@ display(df_gold_regional)
 # COMMAND ----------
 
 gold_tables = {
-    "gold_executive_kpis":    (df_gold_kpis,     None),
-    "gold_category_perf":     (df_gold_category,  None),
-    "gold_monthly_trend":     (df_gold_monthly,   None),
-    "gold_rfm":               (df_gold_rfm,        None),
-    "gold_regional_summary":  (df_gold_regional,  None),
+    "gold_executive_kpis": (df_gold_kpis, None),
+    "gold_category_perf": (df_gold_category, None),
+    "gold_monthly_trend": (df_gold_monthly, None),
+    "gold_rfm": (df_gold_rfm, None),
+    "gold_regional_summary": (df_gold_regional, None),
 }
 
 for table_name, (df, partition_col) in gold_tables.items():
@@ -181,7 +186,9 @@ for table_name, (df, partition_col) in gold_tables.items():
         continue
 
     path = f"{GOLD_PATH}/{table_name}"
-    writer = df.write.format("delta").mode("overwrite").option("overwriteSchema", "true")
+    writer = (
+        df.write.format("delta").mode("overwrite").option("overwriteSchema", "true")
+    )
 
     if partition_col:
         writer = writer.partitionBy(partition_col)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Script para gerar dados de exemplo para o treinamento.
-Execute localmente para criar os arquivos CSV que serão enviados ao DBFS.
+Execute localmente para criar os arquivos CSV que serão enviados ao Volume Unity Catalog.
 
 Uso:
     python scripts/generate_sample_data.py
@@ -10,8 +10,8 @@ Os arquivos serão gerados em data/raw/
 """
 
 import csv
-import random
 import os
+import random
 from datetime import datetime, timedelta
 
 # Seed para reprodutibilidade
@@ -34,7 +34,7 @@ PRODUCTS = {
         ("Notebook Dell", 3500.0),
         ("Tablet iPad", 2800.0),
         ("Fone Bluetooth", 250.0),
-        ("Smart TV 55\"", 2200.0),
+        ('Smart TV 55"', 2200.0),
     ],
     "vestuario": [
         ("Camiseta Nike", 120.0),
@@ -96,17 +96,19 @@ def generate_orders():
         region = random.choice(REGIONS)
         status = random.choices(STATUS, weights=STATUS_WEIGHTS)[0]
 
-        rows.append({
-            "order_id": order_id,
-            "customer_id": customer_id,
-            "product_category": category,
-            "product_name": product_name,
-            "quantity": quantity,
-            "unit_price": unit_price,
-            "order_date": order_date,
-            "region": region,
-            "status": status,
-        })
+        rows.append(
+            {
+                "order_id": order_id,
+                "customer_id": customer_id,
+                "product_category": category,
+                "product_name": product_name,
+                "quantity": quantity,
+                "unit_price": unit_price,
+                "order_date": order_date,
+                "region": region,
+                "status": status,
+            }
+        )
 
     # Injeta alguns problemas de qualidade para os exercícios de limpeza
     # Duplicatas
@@ -128,18 +130,31 @@ def generate_customers():
         customer_id = f"CUST-{i+1:04d}"
         name = f"Cliente {i+1}"
         email = f"cliente{i+1}@email.com"
-        city = random.choice(["São Paulo", "Rio de Janeiro", "Belo Horizonte",
-                              "Curitiba", "Porto Alegre", "Salvador", "Fortaleza"])
-        signup_date = (start_date - timedelta(days=random.randint(0, 365))).strftime("%Y-%m-%d")
+        city = random.choice(
+            [
+                "São Paulo",
+                "Rio de Janeiro",
+                "Belo Horizonte",
+                "Curitiba",
+                "Porto Alegre",
+                "Salvador",
+                "Fortaleza",
+            ]
+        )
+        signup_date = (start_date - timedelta(days=random.randint(0, 365))).strftime(
+            "%Y-%m-%d"
+        )
         segment = random.choice(["B2C", "B2B", "B2B2C"])
-        rows.append({
-            "customer_id": customer_id,
-            "name": name,
-            "email": email,
-            "city": city,
-            "signup_date": signup_date,
-            "segment": segment,
-        })
+        rows.append(
+            {
+                "customer_id": customer_id,
+                "name": name,
+                "email": email,
+                "city": city,
+                "signup_date": signup_date,
+                "segment": segment,
+            }
+        )
     return rows
 
 
@@ -156,9 +171,13 @@ if __name__ == "__main__":
     print("Gerando dados de exemplo...")
     write_csv("orders.csv", generate_orders())
     write_csv("customers.csv", generate_customers())
-    print("\nConcluído! Faça upload dos arquivos para o DBFS:")
-    print("  dbfs:/FileStore/training/raw/orders.csv")
-    print("  dbfs:/FileStore/training/raw/customers.csv")
+    print("\nConcluído! Faça upload dos arquivos para o Volume:")
+    print("  dbfs:/Volumes/workspace/training_sql_serverless/raw_files/orders.csv")
+    print("  dbfs:/Volumes/workspace/training_sql_serverless/raw_files/customers.csv")
     print("\nOu use o comando da CLI Databricks:")
-    print("  databricks fs cp data/raw/orders.csv dbfs:/FileStore/training/raw/orders.csv")
-    print("  databricks fs cp data/raw/customers.csv dbfs:/FileStore/training/raw/customers.csv")
+    print(
+        "  databricks fs cp data/raw/orders.csv dbfs:/Volumes/workspace/training_sql_serverless/raw_files/orders.csv"
+    )
+    print(
+        "  databricks fs cp data/raw/customers.csv dbfs:/Volumes/workspace/training_sql_serverless/raw_files/customers.csv"
+    )

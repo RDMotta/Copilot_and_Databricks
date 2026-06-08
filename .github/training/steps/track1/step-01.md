@@ -10,14 +10,12 @@ Bem-vindo ao treinamento! Antes de colocar a mão na massa, você precisa config
 
 ### ✅ Checklist de Setup
 
-#### 1. Databricks Community Edition
-- [ ] Acesse https://community.cloud.databricks.com/login.html
-- [ ] Clique em **"Sign Up"** → **"Get started with Community Edition"**
+#### 1. Databricks Free Edition
+- [ ] Acesse https://login.databricks.com/?dbx_source=docs&intent=CE_SIGN_UP
+- [ ] Crie sua conta gratuita no Databricks Free Edition
 - [ ] Confirme o e-mail e faça login
-- [ ] Crie um cluster: **Compute → Create compute**
-  - Cluster name: `training-cluster`
-  - Runtime: `14.x LTS`
-  - Aguarde o cluster ficar verde ✅
+- [ ] Crie um compute serverless disponível na Free Edition
+- [ ] Aguarde o compute ficar verde ✅
 
 #### 2. VS Code
 - [ ] Instale o VS Code: https://code.visualstudio.com/
@@ -43,9 +41,9 @@ cd {{REPO}}
 ```bash
 python scripts/generate_sample_data.py
 ```
-Faça upload dos arquivos gerados para o Databricks DBFS:
-- `data/raw/orders.csv` → `dbfs:/FileStore/training/raw/orders.csv`
-- `data/raw/customers.csv` → `dbfs:/FileStore/training/raw/customers.csv`
+Faça upload dos arquivos gerados para o Volume da trilha:
+- `data/raw/orders.csv` → `/Volumes/workspace/training_sql_serverless/raw_files/orders.csv`
+- `data/raw/customers.csv` → `/Volumes/workspace/training_sql_serverless/raw_files/customers.csv`
 
 ---
 
