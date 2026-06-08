@@ -19,14 +19,15 @@
 
 # COMMAND ----------
 
+import re
+
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
-from pyspark.sql.types import TimestampType, DoubleType
-import re
+from pyspark.sql.types import DoubleType, TimestampType
 
 # Caminhos do projeto
 PROJECT_NAME = "ecommerce_lakehouse"
-SILVER_PATH  = f"/FileStore/training/{PROJECT_NAME}/silver"
+SILVER_PATH = f"/Volumes/workspace/training_sql_serverless/{PROJECT_NAME}/silver"
 
 spark.sql("USE ecommerce_lakehouse")
 
@@ -38,7 +39,7 @@ spark.sql("USE ecommerce_lakehouse")
 # COMMAND ----------
 
 # Leitura das tabelas Bronze (já registradas no catálogo)
-df_bronze_orders    = spark.table("bronze_orders")
+df_bronze_orders = spark.table("bronze_orders")
 df_bronze_customers = spark.table("bronze_customers")
 
 print(f"Bronze orders:    {df_bronze_orders.count()} registros")
@@ -60,6 +61,7 @@ print(f"Bronze customers: {df_bronze_customers.count()} registros")
 # MAGIC > 7) Remove colunas de auditoria Bronze (prefixo _)"*
 
 # COMMAND ----------
+
 
 def clean_silver_orders(df: DataFrame) -> DataFrame:
     """
@@ -85,6 +87,7 @@ def clean_silver_orders(df: DataFrame) -> DataFrame:
 # Regex para validação de email (padrão simples para exercício)
 EMAIL_PATTERN = r"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
 
+
 def clean_silver_customers(df: DataFrame) -> DataFrame:
     """
     Transforma clientes da Bronze para Silver.
@@ -101,7 +104,7 @@ def clean_silver_customers(df: DataFrame) -> DataFrame:
 
 # COMMAND ----------
 
-df_silver_orders    = clean_silver_orders(df_bronze_orders)
+df_silver_orders = clean_silver_orders(df_bronze_orders)
 df_silver_customers = clean_silver_customers(df_bronze_customers)
 
 # Exiba samples para validação visual
@@ -126,11 +129,12 @@ print(f"Total: {df_silver_customers.count()} registros")
 
 # Enriquecimento com dados do cliente
 df_silver_enriched = (
-    df_silver_orders
-    .join(
-        F.broadcast(df_silver_customers.select("customer_id", "name", "city", "segment")),
+    df_silver_orders.join(
+        F.broadcast(
+            df_silver_customers.select("customer_id", "name", "city", "segment")
+        ),
         on="customer_id",
-        how="left"
+        how="left",
     )
     .withColumnRenamed("name", "customer_name")
     .withColumnRenamed("city", "customer_city")
@@ -152,9 +156,7 @@ display(df_silver_enriched.limit(5))
 
 # Salvar pedidos limpos (particionado por ano)
 (
-    df_silver_enriched
-    .write
-    .format("delta")
+    df_silver_enriched.write.format("delta")
     .mode("overwrite")
     .partitionBy("order_year")
     .option("overwriteSchema", "true")
@@ -169,9 +171,7 @@ spark.sql(f"""
 
 # Salvar clientes limpos
 (
-    df_silver_customers
-    .write
-    .format("delta")
+    df_silver_customers.write.format("delta")
     .mode("overwrite")
     .option("overwriteSchema", "true")
     .save(f"{SILVER_PATH}/customers")
@@ -198,9 +198,9 @@ print("Camada Silver salva com sucesso!")
 # COMMAND ----------
 
 # Relatório de qualidade: Bronze vs Silver
-n_bronze_orders  = df_bronze_orders.count()
-n_silver_orders  = df_silver_enriched.count()
-n_removed        = n_bronze_orders - n_silver_orders
+n_bronze_orders = df_bronze_orders.count()
+n_silver_orders = df_silver_enriched.count()
+n_removed = n_bronze_orders - n_silver_orders
 taxa_aproveitamento = (n_silver_orders / n_bronze_orders) * 100
 
 print(f"{'='*50}")

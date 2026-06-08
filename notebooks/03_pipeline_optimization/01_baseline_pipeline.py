@@ -16,15 +16,18 @@
 
 # COMMAND ----------
 
-from pyspark.sql import DataFrame
-from pyspark.sql import functions as F
 import time
 
-# Caminhos dos dados brutos (após upload via generate_sample_data.py)
-RAW_ORDERS_PATH   = "/FileStore/training/raw/orders.csv"
-RAW_CUSTOMERS_PATH = "/FileStore/training/raw/customers.csv"
+from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
 
-OUTPUT_BASE = "/FileStore/training/baseline"
+# Caminhos dos dados brutos (após upload via generate_sample_data.py)
+RAW_ORDERS_PATH = "/Volumes/workspace/training_sql_serverless/raw_files/orders.csv"
+RAW_CUSTOMERS_PATH = (
+    "/Volumes/workspace/training_sql_serverless/raw_files/customers.csv"
+)
+
+OUTPUT_BASE = "/Volumes/workspace/training_sql_serverless/baseline"
 
 # COMMAND ----------
 
@@ -40,23 +43,23 @@ t_start = time.time()
 
 # Leitura sem schema definido (inferência é lenta em datasets grandes)
 df_orders = (
-    spark.read
-    .option("header", "true")
-    .option("inferSchema", "true")   # ⚠️ Problemático em produção — scan duplo do arquivo
+    spark.read.option("header", "true")
+    .option(
+        "inferSchema", "true"
+    )  # ⚠️ Problemático em produção — scan duplo do arquivo
     .csv(RAW_ORDERS_PATH)
 )
 
 df_customers = (
-    spark.read
-    .option("header", "true")
-    .option("inferSchema", "true")   # ⚠️ Idem
+    spark.read.option("header", "true")
+    .option("inferSchema", "true")  # ⚠️ Idem
     .csv(RAW_CUSTOMERS_PATH)
 )
 
 t_read = time.time()
 print(f"Leitura: {t_read - t_start:.2f}s")
-print(f"Pedidos: {df_orders.count()} registros")    # ⚠️ count() acionado cedo
-print(f"Clientes: {df_customers.count()} registros") # ⚠️ idem
+print(f"Pedidos: {df_orders.count()} registros")  # ⚠️ count() acionado cedo
+print(f"Clientes: {df_customers.count()} registros")  # ⚠️ idem
 
 # COMMAND ----------
 
@@ -94,11 +97,7 @@ print(f"Limpeza: {t_clean - t_read:.2f}s")
 # COMMAND ----------
 
 # ⚠️ Sort merge join em tabelas pequenas — broadcast seria mais eficiente
-df_enriched = df_orders_clean.join(
-    df_customers,
-    on="customer_id",
-    how="left"
-)
+df_enriched = df_orders_clean.join(df_customers, on="customer_id", how="left")
 
 t_join = time.time()
 print(f"Join: {t_join - t_clean:.2f}s")
@@ -114,8 +113,7 @@ print(f"Join: {t_join - t_clean:.2f}s")
 
 # Métricas por categoria
 df_by_category = (
-    df_enriched
-    .groupBy("product_category")
+    df_enriched.groupBy("product_category")
     .agg(
         F.count("order_id").alias("total_orders"),
         F.sum("total_amount").alias("total_revenue"),
@@ -126,8 +124,7 @@ df_by_category = (
 
 # Métricas por região
 df_by_region = (
-    df_enriched
-    .groupBy("region")
+    df_enriched.groupBy("region")
     .agg(
         F.count("order_id").alias("total_orders"),
         F.sum("total_amount").alias("total_revenue"),
@@ -137,8 +134,7 @@ df_by_region = (
 
 # Métricas por período
 df_by_period = (
-    df_enriched
-    .groupBy("order_year", "order_month")
+    df_enriched.groupBy("order_year", "order_month")
     .agg(
         F.count("order_id").alias("total_orders"),
         F.sum("total_amount").alias("total_revenue"),

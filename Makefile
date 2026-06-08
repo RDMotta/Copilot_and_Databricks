@@ -12,7 +12,7 @@ ifneq (,$(wildcard .env))
 endif
 
 # Defaults para paths do Volume (sobrescritos pelo .env se definidos)
-VOLUME_CATALOG      ?= main
+VOLUME_CATALOG      ?= workspace
 VOLUME_SCHEMA       ?= training_sql_serverless
 VOLUME_NAME         ?= raw_files
 VOLUME_RAW_PATH     ?= /Volumes/$(VOLUME_CATALOG)/$(VOLUME_SCHEMA)/$(VOLUME_NAME)

@@ -47,8 +47,8 @@ make upload-data
 ```
 
 Os arquivos serao enviados para:
-- `dbfs:/Volumes/main/training_sql_serverless/raw_files/orders.csv`
-- `dbfs:/Volumes/main/training_sql_serverless/raw_files/customers.csv`
+- `dbfs:/Volumes/workspace/training_sql_serverless/raw_files/orders.csv`
+- `dbfs:/Volumes/workspace/training_sql_serverless/raw_files/customers.csv`
 
 ---
 
@@ -65,7 +65,7 @@ Objetivo desta etapa:
 
 ### 💡 Prompt Copilot sugerido
 
-> "Gere SQL para criar uma tabela bronze_orders_raw a partir de read_files no caminho dbfs:/Volumes/main/training_sql_serverless/raw_files/orders.csv, adicionando colunas _ingestion_timestamp e _source_file."
+> "Gere SQL para criar uma tabela bronze_orders_raw a partir de read_files no caminho dbfs:/Volumes/workspace/training_sql_serverless/raw_files/orders.csv, adicionando colunas _ingestion_timestamp e _source_file."
 
 ### ▶️ Como avancar
 

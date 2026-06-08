@@ -18,16 +18,22 @@
 
 # COMMAND ----------
 
+from datetime import datetime
+
 from pyspark.sql import functions as F
 from pyspark.sql.types import (
-    StructType, StructField, StringType, IntegerType, DoubleType, TimestampType
+    DoubleType,
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
 )
-from datetime import datetime
 
 # Configuração de caminhos do projeto
 PROJECT_NAME = "ecommerce_lakehouse"
-BRONZE_PATH  = f"/FileStore/training/{PROJECT_NAME}/bronze"
-SOURCE_PATH  = "/FileStore/training/raw"
+BRONZE_PATH = f"/Volumes/workspace/training_sql_serverless/{PROJECT_NAME}/bronze"
+SOURCE_PATH = "/Volumes/workspace/training_sql_serverless/raw_files"
 
 # COMMAND ----------
 
@@ -43,7 +49,7 @@ SOURCE_PATH  = "/FileStore/training/raw"
 # MAGIC %sql
 # MAGIC CREATE DATABASE IF NOT EXISTS ecommerce_lakehouse
 # MAGIC COMMENT 'Projeto Lakehouse de E-commerce - Treinamento Databricks + Copilot'
-# MAGIC LOCATION '/FileStore/training/ecommerce_lakehouse/';
+# MAGIC LOCATION '/Volumes/workspace/training_sql_serverless/ecommerce_lakehouse/';
 # MAGIC
 # MAGIC USE ecommerce_lakehouse;
 
@@ -58,6 +64,7 @@ SOURCE_PATH  = "/FileStore/training/raw"
 # MAGIC > Adicione também uma coluna _corrupt_record para capturar linhas com problema de parse"*
 
 # COMMAND ----------
+
 
 def ingest_to_bronze(
     source_path: str,
@@ -97,26 +104,30 @@ def ingest_to_bronze(
 
 # COMMAND ----------
 
-orders_schema = StructType([
-    StructField("order_id",         StringType(),  True),
-    StructField("customer_id",      StringType(),  True),
-    StructField("product_category", StringType(),  True),
-    StructField("product_name",     StringType(),  True),
-    StructField("quantity",         IntegerType(), True),
-    StructField("unit_price",       DoubleType(),  True),
-    StructField("order_date",       StringType(),  True),
-    StructField("region",           StringType(),  True),
-    StructField("status",           StringType(),  True),
-])
+orders_schema = StructType(
+    [
+        StructField("order_id", StringType(), True),
+        StructField("customer_id", StringType(), True),
+        StructField("product_category", StringType(), True),
+        StructField("product_name", StringType(), True),
+        StructField("quantity", IntegerType(), True),
+        StructField("unit_price", DoubleType(), True),
+        StructField("order_date", StringType(), True),
+        StructField("region", StringType(), True),
+        StructField("status", StringType(), True),
+    ]
+)
 
-customers_schema = StructType([
-    StructField("customer_id",  StringType(), True),
-    StructField("name",         StringType(), True),
-    StructField("email",        StringType(), True),
-    StructField("city",         StringType(), True),
-    StructField("signup_date",  StringType(), True),
-    StructField("segment",      StringType(), True),
-])
+customers_schema = StructType(
+    [
+        StructField("customer_id", StringType(), True),
+        StructField("name", StringType(), True),
+        StructField("email", StringType(), True),
+        StructField("city", StringType(), True),
+        StructField("signup_date", StringType(), True),
+        StructField("segment", StringType(), True),
+    ]
+)
 
 # COMMAND ----------
 

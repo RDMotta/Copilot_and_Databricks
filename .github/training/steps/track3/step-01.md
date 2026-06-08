@@ -34,7 +34,7 @@ CREATE VOLUME IF NOT EXISTS main.training_sql_serverless.raw_files;
 ### 3. Gerar e enviar dados de exemplo
 ```bash
 make generate-data   # gera data/raw/orders.csv e customers.csv
-make upload-data     # envia para /Volumes/main/training_sql_serverless/raw_files/
+make upload-data     # envia para /Volumes/workspace/training_sql_serverless/raw_files/
 ```
 
 ---

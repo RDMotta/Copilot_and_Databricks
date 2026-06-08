@@ -85,7 +85,7 @@ print(f"App Name: {spark.sparkContext.appName}")
 # COMMAND ----------
 
 # Salve o DataFrame de funcionários no DBFS no formato Delta Lake
-# Caminho: /FileStore/training/funcionarios/
+# Caminho: /Volumes/workspace/training_sql_serverless/funcionarios/
 # Modo: overwrite
 # TODO: Copilot vai sugerir o código de escrita Delta
 

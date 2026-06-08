@@ -42,8 +42,8 @@ cd {{REPO}}
 python scripts/generate_sample_data.py
 ```
 Faça upload dos arquivos gerados para o Volume da trilha:
-- `data/raw/orders.csv` → `/Volumes/main/training_sql_serverless/raw_files/orders.csv`
-- `data/raw/customers.csv` → `/Volumes/main/training_sql_serverless/raw_files/customers.csv`
+- `data/raw/orders.csv` → `/Volumes/workspace/training_sql_serverless/raw_files/orders.csv`
+- `data/raw/customers.csv` → `/Volumes/workspace/training_sql_serverless/raw_files/customers.csv`
 
 ---
 

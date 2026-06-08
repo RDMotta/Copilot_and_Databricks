@@ -17,11 +17,18 @@
 
 from pyspark.sql import functions as F
 from pyspark.sql.types import (
-    StructType, StructField, StringType, IntegerType, DoubleType, TimestampType
+    DoubleType,
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
 )
 
-RAW_ORDERS_PATH    = "/FileStore/training/raw/orders.csv"
-RAW_CUSTOMERS_PATH = "/FileStore/training/raw/customers.csv"
+RAW_ORDERS_PATH = "/Volumes/workspace/training_sql_serverless/raw_files/orders.csv"
+RAW_CUSTOMERS_PATH = (
+    "/Volumes/workspace/training_sql_serverless/raw_files/customers.csv"
+)
 
 # COMMAND ----------
 
@@ -35,29 +42,37 @@ RAW_CUSTOMERS_PATH = "/FileStore/training/raw/customers.csv"
 # COMMAND ----------
 
 # Schema explícito — primeiro diagnóstico: o baseline usava inferSchema
-orders_schema = StructType([
-    StructField("order_id",          StringType(),  True),
-    StructField("customer_id",       StringType(),  True),
-    StructField("product_category",  StringType(),  True),
-    StructField("product_name",      StringType(),  True),
-    StructField("quantity",          IntegerType(), True),
-    StructField("unit_price",        DoubleType(),  True),
-    StructField("order_date",        StringType(),  True),
-    StructField("region",            StringType(),  True),
-    StructField("status",            StringType(),  True),
-])
+orders_schema = StructType(
+    [
+        StructField("order_id", StringType(), True),
+        StructField("customer_id", StringType(), True),
+        StructField("product_category", StringType(), True),
+        StructField("product_name", StringType(), True),
+        StructField("quantity", IntegerType(), True),
+        StructField("unit_price", DoubleType(), True),
+        StructField("order_date", StringType(), True),
+        StructField("region", StringType(), True),
+        StructField("status", StringType(), True),
+    ]
+)
 
-customers_schema = StructType([
-    StructField("customer_id",   StringType(), True),
-    StructField("name",          StringType(), True),
-    StructField("email",         StringType(), True),
-    StructField("city",          StringType(), True),
-    StructField("signup_date",   StringType(), True),
-    StructField("segment",       StringType(), True),
-])
+customers_schema = StructType(
+    [
+        StructField("customer_id", StringType(), True),
+        StructField("name", StringType(), True),
+        StructField("email", StringType(), True),
+        StructField("city", StringType(), True),
+        StructField("signup_date", StringType(), True),
+        StructField("segment", StringType(), True),
+    ]
+)
 
-df_orders    = spark.read.schema(orders_schema).option("header", "true").csv(RAW_ORDERS_PATH)
-df_customers = spark.read.schema(customers_schema).option("header", "true").csv(RAW_CUSTOMERS_PATH)
+df_orders = (
+    spark.read.schema(orders_schema).option("header", "true").csv(RAW_ORDERS_PATH)
+)
+df_customers = (
+    spark.read.schema(customers_schema).option("header", "true").csv(RAW_CUSTOMERS_PATH)
+)
 
 # COMMAND ----------
 

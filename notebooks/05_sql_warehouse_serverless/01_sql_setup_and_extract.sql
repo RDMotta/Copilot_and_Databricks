@@ -34,9 +34,9 @@ SELECT
   region,
   status,
   current_timestamp() AS _ingestion_timestamp,
-  'dbfs:/Volumes/main/training_sql_serverless/raw_files/orders.csv' AS _source_file
+  'dbfs:/Volumes/workspace/training_sql_serverless/raw_files/orders.csv' AS _source_file
 FROM read_files(
-  'dbfs:/Volumes/main/training_sql_serverless/raw_files/orders.csv',
+  'dbfs:/Volumes/workspace/training_sql_serverless/raw_files/orders.csv',
   format => 'csv',
   header => true,
   inferSchema => true
@@ -57,9 +57,9 @@ SELECT
   city,
   signup_date,
   current_timestamp() AS _ingestion_timestamp,
-  'dbfs:/Volumes/main/training_sql_serverless/raw_files/customers.csv' AS _source_file
+  'dbfs:/Volumes/workspace/training_sql_serverless/raw_files/customers.csv' AS _source_file
 FROM read_files(
-  'dbfs:/Volumes/main/training_sql_serverless/raw_files/customers.csv',
+  'dbfs:/Volumes/workspace/training_sql_serverless/raw_files/customers.csv',
   format => 'csv',
   header => true,
   inferSchema => true
